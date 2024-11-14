@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Global</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Global</h1>
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2></h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+        
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="parseFile"><span class="type-signature"></span>parseFile<span class="signature">(filePath)</span><span class="type-signature"> &rarr; {Object}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Parsea el archivo .basm y genera un árbol de instrucciones.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>filePath</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Ruta al archivo .basm a procesar.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="main.js.html">main.js</a>, <a href="main.js.html#line44">line 44</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Un objeto que contiene las instrucciones globales y funciones parseadas.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Object</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="syntaxError"><span class="type-signature"></span>syntaxError<span class="signature">(recognizer, offendingSymbol, line, column, msg, e)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Listener personalizado para capturar y mostrar errores de sintaxis.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>recognizer</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">El objeto reconocedor.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>offendingSymbol</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">El símbolo causante del error.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>line</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">La línea donde ocurrió el error.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>column</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">La columna donde ocurrió el error.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>msg</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">El mensaje de error.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>e</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">El error de sintaxis.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="main.js.html">main.js</a>, <a href="main.js.html#line74">line 74</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="ADDInstruction.html">ADDInstruction</a></li><li><a href="ANDInstruction.html">ANDInstruction</a></li><li><a href="APPInstruction.html">APPInstruction</a></li><li><a href="BFInstruction.html">BFInstruction</a></li><li><a href="BLDInstruction.html">BLDInstruction</a></li><li><a href="BRInstruction.html">BRInstruction</a></li><li><a href="BSTInstruction.html">BSTInstruction</a></li><li><a href="BTInstruction.html">BTInstruction</a></li><li><a href="CATInstruction.html">CATInstruction</a></li><li><a href="CSTInstruction.html">CSTInstruction</a></li><li><a href="DIVInstruction.html">DIVInstruction</a></li><li><a href="EQInstruction.html">EQInstruction</a></li><li><a href="GTEInstruction.html">GTEInstruction</a></li><li><a href="GTInstruction.html">GTInstruction</a></li><li><a href="HLTInstruction.html">HLTInstruction</a></li><li><a href="INIInstruction.html">INIInstruction</a></li><li><a href="INOInstruction.html">INOInstruction</a></li><li><a href="Instruction.html">Instruction</a></li><li><a href="InstructionFactory.html">InstructionFactory</a></li><li><a href="LDFInstruction.html">LDFInstruction</a></li><li><a href="LDVInstruction.html">LDVInstruction</a></li><li><a href="LINInstruction.html">LINInstruction</a></li><li><a href="LNTInstruction.html">LNTInstruction</a></li><li><a href="LRKInstruction.html">LRKInstruction</a></li><li><a href="LTEInstruction.html">LTEInstruction</a></li><li><a href="LTInstruction.html">LTInstruction</a></li><li><a href="LTKInstruction.html">LTKInstruction</a></li><li><a href="MULInstruction.html">MULInstruction</a></li><li><a href="NEGInstruction.html">NEGInstruction</a></li><li><a href="NOPInstruction.html">NOPInstruction</a></li><li><a href="NOTInstruction.html">NOTInstruction</a></li><li><a href="ORInstruction.html">ORInstruction</a></li><li><a href="POPInstruction.html">POPInstruction</a></li><li><a href="PRNInstruction.html">PRNInstruction</a></li><li><a href="RETInstruction.html">RETInstruction</a></li><li><a href="SGNInstruction.html">SGNInstruction</a></li><li><a href="SNTInstruction.html">SNTInstruction</a></li><li><a href="SRKInstruction.html">SRKInstruction</a></li><li><a href="STKInstruction.html">STKInstruction</a></li><li><a href="SUBInstruction.html">SUBInstruction</a></li><li><a href="SWPInstruction.html">SWPInstruction</a></li><li><a href="TOLInstruction.html">TOLInstruction</a></li><li><a href="TOSInstruccion.html">TOSInstruccion</a></li><li><a href="XORInstruction.html">XORInstruction</a></li><li><a href="biesVM.html">biesVM</a></li></ul><h3>Global</h3><ul><li><a href="global.html#parseFile">parseFile</a></li><li><a href="global.html#syntaxError">syntaxError</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Fri Oct 18 2024 08:34:39 GMT-0600 (Central Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

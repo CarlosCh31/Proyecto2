@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: main.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: main.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>#!/usr/bin/env node
+/**
+ *  BIESVM - Código: 01-1pm
+ * Fecha de entrega: 10/16/2024
+ * Coordinador: Carlos Chavarría Campos
+ *
+ * Integrantes:
+ * - Amanda Esquivel Álvarez    Cédula: 118530735
+ * - María Rodríguez Hernández   Cédula: 118760320
+ * - Hazel Molina Fuentes        Cédula: 305340604
+ * - Carlos Chavarría Campos     Cédula: 117930581
+ */
+
+ /**
+ * Descripción:
+ * Este código implementa la ejecución de archivos `.basm` utilizando la máquina virtual BiesVM.
+ * Se incluyen funciones para parsear, procesar, y ejecutar instrucciones escritas en lenguaje ensamblador.
+ *
+ */
+
+import antlr4 from 'antlr4';
+import BiesASMLexer from '../gen/biesASMLexer.js';
+import BiesASMParser from '../gen/biesASMParser.js';
+import biesVM from './BiesVM.js'; // Máquina virtual
+import fs from 'fs';
+
+const filePath = process.argv[2];  // Archivo .basm como input
+/**
+ * Verifica si se proporcionó un archivo como argumento.
+ * Si no, muestra un mensaje de error y termina el proceso.
+ */
+if (!filePath) {
+    console.error('Provea un archivo .basm para correr.');
+    process.exit(1);
+}
+/**
+ * Parsea el archivo .basm y genera un árbol de instrucciones.
+ *
+ * @param {string} filePath - Ruta al archivo .basm a procesar.
+ * @returns {Object} Un objeto que contiene las instrucciones globales y funciones parseadas.
+ *
+ */
+
+function parseFile(filePath) {
+    // Lee el contenido del archivo .basm
+
+    const content = fs.readFileSync(filePath, 'utf-8');
+    // Inicializa el lexer y parser de ANTLR con el contenido del archivo
+    const chars = new antlr4.InputStream(content);
+    const lexer = new BiesASMLexer(chars);
+
+    // Genera tokens a partir del contenido leído
+    const tokens = new antlr4.CommonTokenStream(lexer);
+
+    // Inicializa el parser con los tokens generados
+    const parser = new BiesASMParser(tokens);
+    parser.buildParseTrees = true;
+
+    // Elimina los listeners de errores predeterminados y agrega uno personalizado
+
+    parser.removeErrorListeners();
+    parser.addErrorListener({
+        /**
+         * Listener personalizado para capturar y mostrar errores de sintaxis.
+         *
+         * @param {Object} recognizer - El objeto reconocedor.
+         * @param {Object} offendingSymbol - El símbolo causante del error.
+         * @param {number} line - La línea donde ocurrió el error.
+         * @param {number} column - La columna donde ocurrió el error.
+         * @param {string} msg - El mensaje de error.
+         * @param {Object} e - El error de sintaxis.
+         */
+
+        syntaxError(recognizer, offendingSymbol, line, column, msg, e) {
+            console.error(`Error de sintaxis en línea ${line}:${column}: ${msg}`);
+        }
+    });
+    // Construye el árbol de análisis sintáctico (AST)
+    const tree = parser.program();
+
+    return extractInstructions(tree);
+}
+/*
+ * Recorre el árbol de análisis sintáctico (AST) para extraer las instrucciones
+ * y declaraciones de funciones.
+ *
+ * @param {Object} tree - El árbol de análisis sintáctico generado por ANTLR.
+ * @returns {Object} Un objeto que contiene las instrucciones globales y funciones parseadas.
+ */
+
+function extractInstructions(tree) {
+    const instructions = []; // Lista de instrucciones
+    const functions = {};      // Mapa de funciones parseadas
+
+    console.log("Recorriendo árbol...");
+    // Recorre los nodos hijos del árbol
+    if (tree.children) {
+        tree.children.forEach(child => {
+            console.log(`Tipo de nodo: ${child.constructor.name}`);
+            // Verifica si el nodo es una declaración de función
+            if (child.constructor.name === 'StatementContext') {
+                if (child.functionDeclaration()) {
+                    const functionDecl = child.functionDeclaration();
+                    const functionName = functionDecl.children[1].getText();
+                    const body = [];
+                    functionDecl.instructionBlock().instruction().forEach(instr => {
+                        const command = instr.INSTRUCTION().getText();
+                        const args = instr.arg().map(arg => {
+                            const argText = arg.getText();
+                            return isNaN(argText) ? argText : Number(argText);  // Convertir a número si es posible
+                        });
+                        console.log(`Instrucción en función ${functionName}: ${command}, args: ${args}`);
+                        body.push([command, ...args]);
+                    });
+                    // Almacena la función con su cuerpo de instrucciones
+
+                    functions[functionName] = { body };
+                }
+                // Verifica si el nodo es una instrucción global
+                else if (child.instruction()) {
+                    const instr = child.instruction();
+                    const command = instr.INSTRUCTION().getText();
+                    const args = instr.arg().map(arg => {
+                        const argText = arg.getText();
+                        return isNaN(argText) ? argText : Number(argText);  // Convertir a número si es posible
+                    });
+                    console.log(`Instrucción global: ${command}, args: ${args}`);
+                    instructions.push([command, ...args]);
+                }
+            }
+        });
+    }
+
+    return { instructions, functions };
+}
+
+
+// Ejecuta el archivo proporcionado
+const { instructions, functions } = parseFile(filePath);
+
+// Inicializa la máquina virtual BiesVM y ejecuta las instrucciones
+const vm = new biesVM();
+vm.functions = functions;
+vm.execute(instructions);
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="ADDInstruction.html">ADDInstruction</a></li><li><a href="ANDInstruction.html">ANDInstruction</a></li><li><a href="APPInstruction.html">APPInstruction</a></li><li><a href="BFInstruction.html">BFInstruction</a></li><li><a href="BLDInstruction.html">BLDInstruction</a></li><li><a href="BRInstruction.html">BRInstruction</a></li><li><a href="BSTInstruction.html">BSTInstruction</a></li><li><a href="BTInstruction.html">BTInstruction</a></li><li><a href="CATInstruction.html">CATInstruction</a></li><li><a href="CSTInstruction.html">CSTInstruction</a></li><li><a href="DIVInstruction.html">DIVInstruction</a></li><li><a href="EQInstruction.html">EQInstruction</a></li><li><a href="GTEInstruction.html">GTEInstruction</a></li><li><a href="GTInstruction.html">GTInstruction</a></li><li><a href="HLTInstruction.html">HLTInstruction</a></li><li><a href="INIInstruction.html">INIInstruction</a></li><li><a href="INOInstruction.html">INOInstruction</a></li><li><a href="Instruction.html">Instruction</a></li><li><a href="InstructionFactory.html">InstructionFactory</a></li><li><a href="LDFInstruction.html">LDFInstruction</a></li><li><a href="LDVInstruction.html">LDVInstruction</a></li><li><a href="LINInstruction.html">LINInstruction</a></li><li><a href="LNTInstruction.html">LNTInstruction</a></li><li><a href="LRKInstruction.html">LRKInstruction</a></li><li><a href="LTEInstruction.html">LTEInstruction</a></li><li><a href="LTInstruction.html">LTInstruction</a></li><li><a href="LTKInstruction.html">LTKInstruction</a></li><li><a href="MULInstruction.html">MULInstruction</a></li><li><a href="NEGInstruction.html">NEGInstruction</a></li><li><a href="NOPInstruction.html">NOPInstruction</a></li><li><a href="NOTInstruction.html">NOTInstruction</a></li><li><a href="ORInstruction.html">ORInstruction</a></li><li><a href="POPInstruction.html">POPInstruction</a></li><li><a href="PRNInstruction.html">PRNInstruction</a></li><li><a href="RETInstruction.html">RETInstruction</a></li><li><a href="SGNInstruction.html">SGNInstruction</a></li><li><a href="SNTInstruction.html">SNTInstruction</a></li><li><a href="SRKInstruction.html">SRKInstruction</a></li><li><a href="STKInstruction.html">STKInstruction</a></li><li><a href="SUBInstruction.html">SUBInstruction</a></li><li><a href="SWPInstruction.html">SWPInstruction</a></li><li><a href="TOLInstruction.html">TOLInstruction</a></li><li><a href="TOSInstruccion.html">TOSInstruccion</a></li><li><a href="XORInstruction.html">XORInstruction</a></li><li><a href="biesVM.html">biesVM</a></li></ul><h3>Global</h3><ul><li><a href="global.html#parseFile">parseFile</a></li><li><a href="global.html#syntaxError">syntaxError</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Fri Oct 18 2024 08:34:39 GMT-0600 (Central Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

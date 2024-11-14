@@ -1,0 +1,20 @@
+{
+  "name": "bies-compiler",
+  "version": "1.0.0",
+  "description": "Un compilador básico para la máquina virtual BiesVM",
+  "main": "main.js",
+  "type": "module",
+  "scripts": {
+    "generate-parser": "java -jar lib/antlr-4.13.2-complete.jar -Dlanguage=JavaScript -visitor -o gen grammar/bies.g4",
+    "compile": "node main.js"
+  },
+  "bin": {
+    "biesC": "./src/main.js"
+  },
+  "dependencies": {
+    "antlr4": "^4.13.2"
+  },
+  "keywords": [],
+  "author": "Carlos Chavarria, Amanda Esquivel, Maria Rodriguez, Hazel Molina",
+  "license": "ISC"
+}

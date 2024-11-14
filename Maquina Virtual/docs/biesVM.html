@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Class: biesVM</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Class: biesVM</h1>
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2><span class="attribs"><span class="type-signature"></span></span>biesVM<span class="signature">()</span><span class="type-signature"></span></h2>
+        
+            <div class="class-description">Clase que representa la máquina virtual BiesVM.Ejecuta un conjunto de instrucciones en lenguaje ensamblador, manteniendo una pila devalores y gestionando funciones a través de un contexto de ejecución.</div>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+    
+    <h2>Constructor</h2>
+    
+
+    
+    <h4 class="name" id="biesVM"><span class="type-signature"></span>new biesVM<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Constructor de la clase BiesVM.Inicializa la pila, el ámbito, el contexto de ejecución, las instrucciones, las funciones,y una fábrica de instrucciones.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="BiesVM.js.html">BiesVM.js</a>, <a href="BiesVM.js.html#line27">line 27</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="code"><span class="type-signature"></span>code<span class="type-signature"> :Array</span></h4>
+
+
+
+
+<div class="description">
+    Conjunto de instrucciones a ejecutar.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Array</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="BiesVM.js.html">BiesVM.js</a>, <a href="BiesVM.js.html#line55">line 55</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="context"><span class="type-signature"></span>context<span class="type-signature"> :Object</span></h4>
+
+
+
+
+<div class="description">
+    Contexto de ejecución que incluye la pila de instrucciones y el contadordel programa (pc).- pile: Pila de ejecución- pc: Contador de programa
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="BiesVM.js.html">BiesVM.js</a>, <a href="BiesVM.js.html#line51">line 51</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="functions"><span class="type-signature"></span>functions<span class="type-signature"> :Object</span></h4>
+
+
+
+
+<div class="description">
+    Mapa de funciones disponibles en la ejecución.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="BiesVM.js.html">BiesVM.js</a>, <a href="BiesVM.js.html#line59">line 59</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="instructionFactory"><span class="type-signature"></span>instructionFactory<span class="type-signature"> :<a href="InstructionFactory.html">InstructionFactory</a></span></h4>
+
+
+
+
+<div class="description">
+    Fábrica de instrucciones para crear instancias de las mismas.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type"><a href="InstructionFactory.html">InstructionFactory</a></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="BiesVM.js.html">BiesVM.js</a>, <a href="BiesVM.js.html#line62">line 62</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="scope"><span class="type-signature"></span>scope<span class="type-signature"> :Array</span></h4>
+
+
+
+
+<div class="description">
+    Ámbito actual de variables.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Array</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="BiesVM.js.html">BiesVM.js</a>, <a href="BiesVM.js.html#line41">line 41</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="stack"><span class="type-signature"></span>stack<span class="type-signature"> :Array</span></h4>
+
+
+
+
+<div class="description">
+    Pila de valores utilizada por la máquina virtual.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Array</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="BiesVM.js.html">BiesVM.js</a>, <a href="BiesVM.js.html#line37">line 37</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="execute"><span class="type-signature"></span>execute<span class="signature">(instructions)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Ejecuta el conjunto de instrucciones provistas.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>instructions</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Un array de instrucciones, donde cada instrucciónes un array que contiene el nombre de la instrucción seguido de sus argumentos.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="BiesVM.js.html">BiesVM.js</a>, <a href="BiesVM.js.html#line73">line 73</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+
+        
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        Lanza un error si el formato de la instrucción es inválido.
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">Error</span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+
+    
+
+
+
+
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="ADDInstruction.html">ADDInstruction</a></li><li><a href="ANDInstruction.html">ANDInstruction</a></li><li><a href="APPInstruction.html">APPInstruction</a></li><li><a href="BFInstruction.html">BFInstruction</a></li><li><a href="BLDInstruction.html">BLDInstruction</a></li><li><a href="BRInstruction.html">BRInstruction</a></li><li><a href="BSTInstruction.html">BSTInstruction</a></li><li><a href="BTInstruction.html">BTInstruction</a></li><li><a href="CATInstruction.html">CATInstruction</a></li><li><a href="CSTInstruction.html">CSTInstruction</a></li><li><a href="DIVInstruction.html">DIVInstruction</a></li><li><a href="EQInstruction.html">EQInstruction</a></li><li><a href="GTEInstruction.html">GTEInstruction</a></li><li><a href="GTInstruction.html">GTInstruction</a></li><li><a href="HLTInstruction.html">HLTInstruction</a></li><li><a href="INIInstruction.html">INIInstruction</a></li><li><a href="INOInstruction.html">INOInstruction</a></li><li><a href="Instruction.html">Instruction</a></li><li><a href="InstructionFactory.html">InstructionFactory</a></li><li><a href="LDFInstruction.html">LDFInstruction</a></li><li><a href="LDVInstruction.html">LDVInstruction</a></li><li><a href="LINInstruction.html">LINInstruction</a></li><li><a href="LNTInstruction.html">LNTInstruction</a></li><li><a href="LRKInstruction.html">LRKInstruction</a></li><li><a href="LTEInstruction.html">LTEInstruction</a></li><li><a href="LTInstruction.html">LTInstruction</a></li><li><a href="LTKInstruction.html">LTKInstruction</a></li><li><a href="MULInstruction.html">MULInstruction</a></li><li><a href="NEGInstruction.html">NEGInstruction</a></li><li><a href="NOPInstruction.html">NOPInstruction</a></li><li><a href="NOTInstruction.html">NOTInstruction</a></li><li><a href="ORInstruction.html">ORInstruction</a></li><li><a href="POPInstruction.html">POPInstruction</a></li><li><a href="PRNInstruction.html">PRNInstruction</a></li><li><a href="RETInstruction.html">RETInstruction</a></li><li><a href="SGNInstruction.html">SGNInstruction</a></li><li><a href="SNTInstruction.html">SNTInstruction</a></li><li><a href="SRKInstruction.html">SRKInstruction</a></li><li><a href="STKInstruction.html">STKInstruction</a></li><li><a href="SUBInstruction.html">SUBInstruction</a></li><li><a href="SWPInstruction.html">SWPInstruction</a></li><li><a href="TOLInstruction.html">TOLInstruction</a></li><li><a href="TOSInstruccion.html">TOSInstruccion</a></li><li><a href="XORInstruction.html">XORInstruction</a></li><li><a href="biesVM.html">biesVM</a></li></ul><h3>Global</h3><ul><li><a href="global.html#parseFile">parseFile</a></li><li><a href="global.html#syntaxError">syntaxError</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Fri Oct 18 2024 08:34:39 GMT-0600 (Central Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

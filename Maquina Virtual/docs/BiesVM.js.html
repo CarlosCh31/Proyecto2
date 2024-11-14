@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: BiesVM.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: BiesVM.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>
+/**
+ * Ejercicios BIESVM - Código: 01-1pm
+ * Fecha de entrega: 20 de septiembre de 2024
+ * Coordinador: Carlos Chavarría Campos
+ *
+ * Integrantes:
+ * - Amanda Esquivel Álvarez    Cédula: 118530735
+ * - María Rodríguez Hernández   Cédula: 118760320
+ * - Hazel Molina Fuentes        Cédula: 305340604
+ * - Carlos Chavarría Campos     Cédula: 117930581
+ *
+ * Descripción:
+ * Esta clase implementa la máquina virtual BiesVM, la cual ejecuta instrucciones en
+ * formato ensamblador (.basm). Utiliza una pila, un ámbito local, y un contexto con
+ * una pila de instrucciones y un contador de programa para controlar el flujo de
+ * ejecución de las instrucciones.
+ */
+
+import InstructionFactory from './InstructionFactory.js';
+/**
+ * Clase que representa la máquina virtual BiesVM.
+ * Ejecuta un conjunto de instrucciones en lenguaje ensamblador, manteniendo una pila de
+ * valores y gestionando funciones a través de un contexto de ejecución.
+ */
+
+class biesVM {
+    /**
+     * Constructor de la clase BiesVM.
+     * Inicializa la pila, el ámbito, el contexto de ejecución, las instrucciones, las funciones,
+     * y una fábrica de instrucciones.
+     */
+    constructor() {
+
+        /** @type {Array} Pila de valores utilizada por la máquina virtual. */
+
+        this.stack = [];
+
+        /** @type {Array} Ámbito actual de variables. */
+
+        this.scope = [];
+
+        /**
+         * @type {Object} Contexto de ejecución que incluye la pila de instrucciones y el contador
+         * del programa (pc).
+         * - pile: Pila de ejecución
+         * - pc: Contador de programa
+         */
+
+
+        this.context = {pile: [], pc: 0};
+
+        /** @type {Array} Conjunto de instrucciones a ejecutar. */
+
+        this.code = [];
+
+        /** @type {Object} Mapa de funciones disponibles en la ejecución. */
+
+        this.functions = {};
+
+        /** @type {InstructionFactory} Fábrica de instrucciones para crear instancias de las mismas. */
+        this.instructionFactory = new InstructionFactory();
+    }
+    /**
+     * Ejecuta el conjunto de instrucciones provistas.
+     *
+     * @param {Array} instructions - Un array de instrucciones, donde cada instrucción
+     * es un array que contiene el nombre de la instrucción seguido de sus argumentos.
+     *
+     * @throws {Error} Lanza un error si el formato de la instrucción es inválido.
+     */
+
+    execute(instructions) {
+        this.code = instructions;
+        // Ciclo principal de ejecución
+        while (this.context.pc &lt; this.code.length) {
+            const currentInstruction = this.code[this.context.pc];
+            console.log("Instrucción actual: ",currentInstruction);
+            console.log("Pila antes: ", this.stack);
+
+            // Incrementa el contador de programa
+            this.context.pc++;
+
+
+
+            if (!Array.isArray(currentInstruction)) {
+                throw new Error(`Invalid instruction format: ${currentInstruction}`);
+            }
+
+            // Descompone la instrucción en su nombre y argumentos
+
+            const [instruction, ...args] = currentInstruction;
+
+            // Crea una instancia de la instrucción a través de la fábrica de instrucciones
+
+           const instructionInstance = this.instructionFactory.createInstruction(instruction);
+
+            // Ejecuta la instrucción
+           instructionInstance.execute(this, args);
+           console.log("Pila después: ",this.stack);
+           console.log("Contador de programa: ", this.context.pc);
+        }
+    }
+}
+
+export default biesVM;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="ADDInstruction.html">ADDInstruction</a></li><li><a href="ANDInstruction.html">ANDInstruction</a></li><li><a href="APPInstruction.html">APPInstruction</a></li><li><a href="BFInstruction.html">BFInstruction</a></li><li><a href="BLDInstruction.html">BLDInstruction</a></li><li><a href="BRInstruction.html">BRInstruction</a></li><li><a href="BSTInstruction.html">BSTInstruction</a></li><li><a href="BTInstruction.html">BTInstruction</a></li><li><a href="CATInstruction.html">CATInstruction</a></li><li><a href="CSTInstruction.html">CSTInstruction</a></li><li><a href="DIVInstruction.html">DIVInstruction</a></li><li><a href="EQInstruction.html">EQInstruction</a></li><li><a href="GTEInstruction.html">GTEInstruction</a></li><li><a href="GTInstruction.html">GTInstruction</a></li><li><a href="HLTInstruction.html">HLTInstruction</a></li><li><a href="INIInstruction.html">INIInstruction</a></li><li><a href="INOInstruction.html">INOInstruction</a></li><li><a href="Instruction.html">Instruction</a></li><li><a href="InstructionFactory.html">InstructionFactory</a></li><li><a href="LDFInstruction.html">LDFInstruction</a></li><li><a href="LDVInstruction.html">LDVInstruction</a></li><li><a href="LINInstruction.html">LINInstruction</a></li><li><a href="LNTInstruction.html">LNTInstruction</a></li><li><a href="LRKInstruction.html">LRKInstruction</a></li><li><a href="LTEInstruction.html">LTEInstruction</a></li><li><a href="LTInstruction.html">LTInstruction</a></li><li><a href="LTKInstruction.html">LTKInstruction</a></li><li><a href="MULInstruction.html">MULInstruction</a></li><li><a href="NEGInstruction.html">NEGInstruction</a></li><li><a href="NOPInstruction.html">NOPInstruction</a></li><li><a href="NOTInstruction.html">NOTInstruction</a></li><li><a href="ORInstruction.html">ORInstruction</a></li><li><a href="POPInstruction.html">POPInstruction</a></li><li><a href="PRNInstruction.html">PRNInstruction</a></li><li><a href="RETInstruction.html">RETInstruction</a></li><li><a href="SGNInstruction.html">SGNInstruction</a></li><li><a href="SNTInstruction.html">SNTInstruction</a></li><li><a href="SRKInstruction.html">SRKInstruction</a></li><li><a href="STKInstruction.html">STKInstruction</a></li><li><a href="SUBInstruction.html">SUBInstruction</a></li><li><a href="SWPInstruction.html">SWPInstruction</a></li><li><a href="TOLInstruction.html">TOLInstruction</a></li><li><a href="TOSInstruccion.html">TOSInstruccion</a></li><li><a href="XORInstruction.html">XORInstruction</a></li><li><a href="biesVM.html">biesVM</a></li></ul><h3>Global</h3><ul><li><a href="global.html#parseFile">parseFile</a></li><li><a href="global.html#syntaxError">syntaxError</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Fri Oct 18 2024 08:34:39 GMT-0600 (Central Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
