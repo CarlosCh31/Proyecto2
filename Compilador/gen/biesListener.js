@@ -14,12 +14,30 @@ export default class biesListener extends antlr4.tree.ParseTreeListener {
 	}
 
 
+	// Enter a parse tree produced by biesParser#variableDeclaration.
+	enterVariableDeclaration(ctx) {
+	}
+
+	// Exit a parse tree produced by biesParser#variableDeclaration.
+	exitVariableDeclaration(ctx) {
+	}
+
+
 	// Enter a parse tree produced by biesParser#functionDeclaration.
 	enterFunctionDeclaration(ctx) {
 	}
 
 	// Exit a parse tree produced by biesParser#functionDeclaration.
 	exitFunctionDeclaration(ctx) {
+	}
+
+
+	// Enter a parse tree produced by biesParser#functionCall.
+	enterFunctionCall(ctx) {
+	}
+
+	// Exit a parse tree produced by biesParser#functionCall.
+	exitFunctionCall(ctx) {
 	}
 
 
@@ -47,6 +65,15 @@ export default class biesListener extends antlr4.tree.ParseTreeListener {
 
 	// Exit a parse tree produced by biesParser#StringExpr.
 	exitStringExpr(ctx) {
+	}
+
+
+	// Enter a parse tree produced by biesParser#ConcatExpr.
+	enterConcatExpr(ctx) {
+	}
+
+	// Exit a parse tree produced by biesParser#ConcatExpr.
+	exitConcatExpr(ctx) {
 	}
 
 
@@ -101,6 +128,15 @@ export default class biesListener extends antlr4.tree.ParseTreeListener {
 
 	// Exit a parse tree produced by biesParser#AddSubExpr.
 	exitAddSubExpr(ctx) {
+	}
+
+
+	// Enter a parse tree produced by biesParser#PrintStmtExpr.
+	enterPrintStmtExpr(ctx) {
+	}
+
+	// Exit a parse tree produced by biesParser#PrintStmtExpr.
+	exitPrintStmtExpr(ctx) {
 	}
 
 

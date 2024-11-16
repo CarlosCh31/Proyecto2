@@ -2,12 +2,22 @@ grammar bies;
 
 // Regla de inicio para reconocer funciones y expresiones
 program
-    : (functionDeclaration | printStmt | expr)* EOF
+    : (functionDeclaration | variableDeclaration | printStmt | functionCall)* EOF
+    ;
+
+// Declaración de variables
+variableDeclaration
+    : 'let' ID '=' expr
     ;
 
 // Declaración de funciones
 functionDeclaration
     : 'let' ID '=' '(' paramList? ')' '=>' expr
+    ;
+
+// Llamado de funciones
+functionCall
+    : ID '(' (expr (',' expr)*)? ')'
     ;
 
 // Declaración de `print`
@@ -22,11 +32,13 @@ paramList
 
 // Expresiones aritméticas y paréntesis
 expr
-    : ID '(' (expr (',' expr)*)? ')'    # FunctionCallExpr
-    | expr op=('*' | '/') expr          # MulDivExpr
+    : expr op=('*' | '/') expr          # MulDivExpr
     | expr op=('+' | '-') expr          # AddSubExpr
     | '(' expr ')'                      # ParenExpr
     | '-' expr                          # NegateExpr
+    | expr '+' expr                     # ConcatExpr
+    | functionCall                      # FunctionCallExpr
+    | printStmt                         # PrintStmtExpr
     | ID                                # IdentifierExpr
     | NUMBER                            # NumberExpr
     | STRING                            # StringExpr
