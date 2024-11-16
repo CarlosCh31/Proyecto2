@@ -22,7 +22,13 @@ functionCall
 
 // Declaración de `print`
 printStmt
-    : 'print' '(' expr ')'
+    : 'print' '(' concatExpr ')'
+    ;
+
+// Concatenación
+concatExpr
+    : concatExpr '+' expr          # ConcatOp
+    | expr                         # ConcatTerm
     ;
 
 // Lista de parámetros
@@ -36,7 +42,6 @@ expr
     | expr op=('+' | '-') expr          # AddSubExpr
     | '(' expr ')'                      # ParenExpr
     | '-' expr                          # NegateExpr
-    | expr '+' expr                     # ConcatExpr
     | functionCall                      # FunctionCallExpr
     | printStmt                         # PrintStmtExpr
     | ID                                # IdentifierExpr

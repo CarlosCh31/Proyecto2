@@ -1,5 +1,6 @@
 $FUN $splash args:1 parent:$0
-BLD 1 0,PRN
+BLD 1 0
+PRN
 RET
 $END $splash
 $FUN $0 args:0 parent:$0

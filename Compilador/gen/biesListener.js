@@ -50,6 +50,24 @@ export default class biesListener extends antlr4.tree.ParseTreeListener {
 	}
 
 
+	// Enter a parse tree produced by biesParser#ConcatOp.
+	enterConcatOp(ctx) {
+	}
+
+	// Exit a parse tree produced by biesParser#ConcatOp.
+	exitConcatOp(ctx) {
+	}
+
+
+	// Enter a parse tree produced by biesParser#ConcatTerm.
+	enterConcatTerm(ctx) {
+	}
+
+	// Exit a parse tree produced by biesParser#ConcatTerm.
+	exitConcatTerm(ctx) {
+	}
+
+
 	// Enter a parse tree produced by biesParser#paramList.
 	enterParamList(ctx) {
 	}
@@ -65,15 +83,6 @@ export default class biesListener extends antlr4.tree.ParseTreeListener {
 
 	// Exit a parse tree produced by biesParser#StringExpr.
 	exitStringExpr(ctx) {
-	}
-
-
-	// Enter a parse tree produced by biesParser#ConcatExpr.
-	enterConcatExpr(ctx) {
-	}
-
-	// Exit a parse tree produced by biesParser#ConcatExpr.
-	exitConcatExpr(ctx) {
 	}
 
 

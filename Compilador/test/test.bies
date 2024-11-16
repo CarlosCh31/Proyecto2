@@ -1,2 +1,1 @@
-let sum = (x) => x + 3
-sum(3)
+print("Hello " + "World")

@@ -6,8 +6,9 @@ export default class CompilerVisitor extends BiesVisitor {
         super();
         this.contextStack = ['0'];
         this.contextCounter = 1;
+        this.globalBindingCounter = 0;
         this.collectedFunctions = [];
-        this.functionBindings = {}; // Mapa global para almacenar bindings de funciones
+        this.functionBindings = {}; // Mapa global para bindings de funciones
         this.variables = {};
     }
 
@@ -30,8 +31,7 @@ export default class CompilerVisitor extends BiesVisitor {
         let functionDeclarations = [];
         let mainBody = [`$FUN $0 args:0 parent:$0`];
 
-        // Índice de binding para cada función
-        let bindingIndex = 0;
+        let bindingIndex = this.globalBindingCounter++; // Índice único para todas las variables globales
         for (let i = 0; i < ctx.children.length; i++) {
             const child = ctx.children[i];
 
@@ -42,11 +42,8 @@ export default class CompilerVisitor extends BiesVisitor {
                 const functionName = child.ID().getText();
                 mainBody.push(`LDF $${functionName}`);
                 mainBody.push(`BST 0 ${bindingIndex}`);
-
-                // Almacena tanto el contexto principal como el índice de binding para la función
-                this.functionBindings[functionName] = {context: 0, index: bindingIndex};
-
-                bindingIndex++;  // Incrementa el índice de binding para la próxima función
+                this.functionBindings[functionName] = { context: 0, index: bindingIndex };
+                bindingIndex++;
             } else {
                 const exprCode = this.visit(child);
                 if (Array.isArray(exprCode)) {
@@ -61,26 +58,28 @@ export default class CompilerVisitor extends BiesVisitor {
         return [...functionDeclarations, ...mainBody].join('\n');
     }
 
+
     visitVariableDeclaration(ctx) {
         const variableName = ctx.ID().getText();  // Nombre de la variable
         const value = this.visit(ctx.expr());     // Código de la expresión asignada
 
-        // Obtiene el índice para el binding si no existe en `variables`
-        const bindingIndex = Object.keys(this.variables).length;
-        this.variables[variableName] = {context: 0, index: bindingIndex};
+        // Obtiene el contexto actual
+        const currentContext = this.getCurrentContext();
 
-        // Genera código para almacenar el resultado de la evaluación en el binding
+        const bindingIndex = this.globalBindingCounter++;
+        this.variables[variableName] = { context: currentContext, index: bindingIndex };
+
+        // Genera código para almacenar el valor en el binding
         const result = [];
         if (Array.isArray(value)) {
             result.push(...value); // Código para evaluar la expresión
         } else {
             result.push(`LDV ${value}`);
         }
-        result.push(`BST 0 ${bindingIndex}`);
+        result.push(`BST ${currentContext} ${bindingIndex}`); // Usa el contexto y el índice únicos
 
         return result;
     }
-
 
     visitFunctionDeclaration(ctx) {
         const functionName = ctx.ID().getText();
@@ -126,26 +125,27 @@ export default class CompilerVisitor extends BiesVisitor {
 
     visitIdentifierExpr(ctx) {
         const identifier = ctx.ID().getText();
+        const currentContext = this.getCurrentContext();
 
         // Verifica si el identificador es un parámetro en la función actual
         const currentFunction = this.collectedFunctions.find(
-            f => f.context === this.getCurrentContext()
+            f => f.context === currentContext
         );
 
         if (currentFunction && identifier in currentFunction.parameters) {
-            const {position, context} = currentFunction.parameters[identifier];
+            const { position, context } = currentFunction.parameters[identifier];
             return [`BLD ${context} ${position}`];
         }
 
-        // Verifica si el identificador es una variable global
-        const globalVariable = this.variables[identifier];
-        if (globalVariable) {
-            const {context, index} = globalVariable;
+        // Si no encuentra la variable en el contexto actual, busca en el global
+        if (this.variables[identifier]) {
+            const { context, index } = this.variables[identifier];
             return [`BLD ${context} ${index}`];
         }
 
         throw new Error(`Identificador desconocido: ${identifier}`);
     }
+
 
     visitFunctionCall(ctx) {
         const functionName = ctx.ID().getText();
@@ -207,46 +207,51 @@ export default class CompilerVisitor extends BiesVisitor {
     }
 
     visitStringExpr(ctx) {
-        // Retorna solo el contenido de la cadena sin las comillas
-        return ctx.STRING().getText();
+        // Retorna la cadena con comillas incluidas como literal válido
+        const text = ctx.STRING().getText();
+        return [`LDV "${text.slice(1, -1)}"`]; // Mantiene las comillas dobles
     }
 
     visitPrintStmt(ctx) {
-        // Visita la expresión dentro del `print` para obtener el valor que se debe cargar en la pila
-        const exprCode = this.visit(ctx.expr());
-
-        // Si `exprCode` es un array, asume que ya tiene instrucciones (por ejemplo, `LDV`)
-        if (Array.isArray(exprCode)) {
-            return [...exprCode, 'PRN'];
-        }
-
-        // Si `exprCode` es un valor simple (como un string), genera `LDV` seguido de `PRN`
-        return `LDV ${exprCode}\nPRN`;
+        const concatCode = this.visit(ctx.concatExpr());
+        return [...concatCode, 'PRN'];
     }
 
-    visitConcatExpr(ctx) {
-        const left = this.visit(ctx.expr(0));  // Primer operando de la concatenación
+    visitConcatOp(ctx) {
+        const left = this.visit(ctx.concatExpr(0));  // Primer operando de la concatenación
         const right = this.visit(ctx.expr(1)); // Segundo operando de la concatenación
 
         const result = [];
 
-        // Agregar el código de carga de la parte izquierda
+        // Procesa la parte izquierda
         if (Array.isArray(left)) {
             result.push(...left);
         } else {
             result.push(`LDV ${left}`);
         }
 
-        // Agregar el código de carga de la parte derecha
+        // Si no es un string, convierte a string antes de concatenar
+        result.push('TOS'); // Convierte el resultado izquierdo a string
+
+        // Procesa la parte derecha
         if (Array.isArray(right)) {
             result.push(...right);
         } else {
             result.push(`LDV ${right}`);
         }
 
-        result.push('ADD');  // Operación de concatenación
+        // Si no es un string, convierte a string antes de concatenar
+        result.push('TOS'); // Convierte el resultado derecho a string
+
+        result.push('CAT');  // Usar CAT para concatenar strings
 
         return result;
     }
+
+    visitConcatTerm(ctx) {
+        return this.visit(ctx.expr()); // Delegar a la regla expr
+    }
+
+
 }
 
