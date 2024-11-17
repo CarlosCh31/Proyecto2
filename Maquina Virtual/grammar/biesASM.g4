@@ -63,7 +63,10 @@ INSTRUCTION         : 'INI'
                     | 'RET'
                     | 'CST'
                     | 'INO'
-                    | 'PRN' ;
+                    | 'PRN'
+                    | 'LEN'
+                    | 'MKLIST'
+                    ;
 
 ARG                 : '$' INT | '$' ID | ID;  // Reconoce $ seguido de INT o ID
 

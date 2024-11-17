@@ -352,6 +352,55 @@ export default class CompilerVisitor extends BiesVisitor {
         const value = this.visit(ctx.expr()); // Visita la expresión dentro de int()
         return [...value, 'CST number'];     // Genera la instrucción para conversión a número
     }
+    visitStrExpr(ctx) {
+        const value = this.visit(ctx.expr()); // Visita la expresión dentro de str()
+        return [...value, 'CST string'];     // Genera la instrucción para conversión a string
+    }
+    visitListExpr(ctx) {
+        const values = ctx.value() // Usa la regla `value` para procesar los elementos
+            .map(value => this.visit(value).join('')); // Convierte los valores a literales simples
+        const listLiteral = `[${values.join(',')}]`; // Construye el literal de lista
+        return [`LDV ${listLiteral}`]; // Genera la instrucción LDV con el literal
+    }
+
+    visitNumberValue(ctx) {
+        return [ctx.getText()]; // Devuelve el número como texto
+    }
+    visitStringValue(ctx) {
+        const text = ctx.STRING().getText();
+        return [text.slice(1, -1)]; // Devuelve el texto sin comillas
+    }
+    visitBoolExpr(ctx) {
+        const value = this.visit(ctx.expr());
+        return [...value, 'CST bool']; // Genera la instrucción para convertir a booleano
+    }
+    visitLenExpr(ctx) {
+        const value = this.visit(ctx.expr());
+        return [...value, 'LEN']; // Genera la instrucción para calcular la longitud
+    }
+    visitMakeListExpr(ctx) {
+        const elements = ctx.expr(); // Obtén las expresiones de los elementos
+        const code = [];
+
+        if (elements.length === 0) {
+            // Lista vacía: genera directamente MKLIST 0
+            code.push('MKLIST 0');
+            return code;
+        }
+
+        // Genera instrucciones para evaluar cada elemento
+        elements.forEach(element => {
+            const elementCode = this.visit(element);
+            if (!elementCode) {
+                throw new Error("Elemento en la lista no válido o nulo");
+            }
+            code.push(...elementCode);
+        });
+
+        // Genera la instrucción MKLIST con el número de elementos
+        code.push(`MKLIST ${elements.length}`);
+        return code;
+    }
 
 }
 

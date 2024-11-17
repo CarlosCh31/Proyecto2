@@ -1,2 +1,3 @@
-let result = int("666")
-print(result)
+print(list(1, 2, 3))
+print(list(true, "hello", 42))
+print(list())

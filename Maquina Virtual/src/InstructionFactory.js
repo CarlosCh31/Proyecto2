@@ -93,17 +93,27 @@ class SWPInstruction extends Instruction {
  */
 class LDVInstruction extends Instruction {
     execute(vm, args) {
-        let index = args[0];
+        let value = args[0];
 
-        // Verifica si es una cadena con comillas dobles y extrae el contenido
-        if (typeof index === 'string' && index.startsWith('"') && index.endsWith('"')) {
-            index = index.slice(1, -1); // Remueve las comillas dobles
+        // Si es una cadena literal, asegúrate de eliminar comillas extras
+        if (typeof value === 'string' && value.startsWith('"') && value.endsWith('"')) {
+            value = value.slice(1, -1); // Elimina las comillas
         }
 
-        vm.stack.push(index);
-        logger.debug(vm.stack);
+        // Si es una lista representada como cadena, intenta parsearla
+        if (typeof value === 'string' && value.startsWith('[') && value.endsWith(']')) {
+            try {
+                value = JSON.parse(value);
+            } catch (e) {
+                // Si no es una lista válida, se deja como cadena literal
+            }
+        }
+
+        vm.stack.push(value); // Empuja el valor al stack
     }
 }
+
+
 /**
  * Clase de la instruccion BST para almacenar
  * Valores en el binding
@@ -111,12 +121,14 @@ class LDVInstruction extends Instruction {
 class BSTInstruction extends Instruction {
     execute(vm, args) {
         const [E, K] = args;
-        if (!vm.scope[E]){
-            vm.scope[E] = {}
+        if (!vm.scope[E]) {
+            vm.scope[E] = {};
         }
-        vm.scope[E][K] = vm.stack.pop();
+        const value = vm.stack.pop();
+        vm.scope[E][K] = value; // Almacena el valor (incluyendo listas)
     }
 }
+
 /**
  * Clase de la instruccion EXP que implementa
  * un exponencial
@@ -140,15 +152,16 @@ class BLDInstruction extends Instruction {
     execute(vm, args) {
         const [E, K] = args;
         if (vm.scope[E] === undefined) {
-            throw new Error(`No se encontro el ambiente en index ${E}`);
+            throw new Error(`No se encontró el ambiente en index ${E}`);
         }
-        const valor = vm.scope[E][K];
-        if (valor === undefined) {
-            throw new Error(`No se encontro el valor en index ${K} del ambiente ${E}`);
+        const value = vm.scope[E][K];
+        if (value === undefined) {
+            throw new Error(`No se encontró el valor en index ${K} del ambiente ${E}`);
         }
-        vm.stack.push(valor);
+        vm.stack.push(value); // Recupera el valor tal cual
     }
 }
+
 
 /**
  * Clase de la Instruccion ADD que realiza una suma
@@ -433,6 +446,27 @@ class LNTInstruction extends Instruction {
         vm.stack.push(list.length === 0 ? 1 : 0);
     }
 }
+/**
+ * Clase de la instruccion LEN que verifica el largo de
+ * una lista o string
+ */
+class LENInstruction extends Instruction {
+    execute(vm, args) {
+        const value = vm.stack.pop();
+
+        if (Array.isArray(value)) {
+            vm.stack.push(value.length);
+        } else if (typeof value === 'string') {
+            vm.stack.push(value.length);
+        } else {
+            throw new Error(`Valor no válido para LEN: ${value}`);
+        }
+
+        logger.debug(`LEN calculado: ${vm.stack[vm.stack.length - 1]}`);
+    }
+}
+
+
 
 /**
  * Clase de la instruccion LIN que ingresa en el inicio
@@ -455,6 +489,34 @@ class LINInstruction extends Instruction {
         vm.stack.push(list);
     }
 }
+/**
+ * Clase de la instruccion MKLIST que construye
+ *  una lista
+ */
+class MKLISTInstruction extends Instruction {
+    execute(vm, args) {
+        const n = args[0]; // Número de elementos para formar la lista
+
+        if (typeof n !== 'number' || n < 0) {
+            throw new Error(`MKLIST requiere un número válido, recibido: ${n}`);
+        }
+
+        if (vm.stack.length < n) {
+            throw new Error(`MKLIST: No hay suficientes elementos en el stack para formar la lista`);
+        }
+
+        // Extrae los últimos n elementos del stack y forma la lista
+        const list = [];
+        for (let i = 0; i < n; i++) {
+            list.unshift(vm.stack.pop());
+        }
+
+        vm.stack.push(list); // Empuja la lista resultante al stack
+    }
+}
+
+
+
 
 /**
  * Clase de la instruccion LTK que recupera el k-esimo
@@ -661,21 +723,28 @@ class CSTInstruction extends Instruction {
     execute(vm, args) {
         const [castType] = args;
         const value = vm.stack.pop();
-
-        if (castType === 'number') {
-            const convertedValue = Number(value); // Intenta convertir a número
+        if (castType === 'bool') {
+            // Cualquier valor diferente de 0, "", o null será true
+            vm.stack.push(!!value);
+        }
+        else if (castType === 'number') {
+            const convertedValue = Number(value);
             if (isNaN(convertedValue)) {
                 throw new Error(`Fallo la conversión a número: "${value}" no es válido`);
             }
             vm.stack.push(convertedValue);
         } else if (castType === 'string') {
-            vm.stack.push(String(value)); // Convierte a string
-        } else if (castType === 'list') {
+            // Si es una lista, conviértela a string con formato adecuado
             if (Array.isArray(value)) {
-                vm.stack.push(value);
+                vm.stack.push(`[${value.join(', ')}]`);
             } else {
-                vm.stack.push([value]); // Envuelve en una lista
+                vm.stack.push(String(value));
             }
+        } else if (castType === 'list') {
+            if (!Array.isArray(value)) {
+                throw new Error(`El valor no es una lista: ${value}`);
+            }
+            vm.stack.push(value);
         } else {
             throw new Error(`Tipo de casting no soportado: ${castType}`);
         }
@@ -711,13 +780,23 @@ class INOInstruction extends Instruction {
  */
 class PRNInstruction extends Instruction {
     execute(vm, args) {
-        if(vm.stack.length === 0){
+        if (vm.stack.length === 0) {
             throw new Error("Stack underflow");
         }
+
         const value = vm.stack.pop();
-        console.log(value);
+
+        if (Array.isArray(value)) {
+            // Imprime la lista con formato adecuado
+            console.log(`[${value.join(', ')}]`);
+        } else {
+            // Imprime valores no-lista directamente
+            console.log(value);
+        }
     }
 }
+
+
 /**
  * Clase input para permitir al usuario ingresar informacion
  */
@@ -778,7 +857,9 @@ class InstructionFactory {
             'INO': new INOInstruction(),
             'PRN': new PRNInstruction(),
             'EXP': new EXPInstruction(),
-            'INPUT': new INPUTInstruction()
+            'INPUT': new INPUTInstruction(),
+            'MKLIST': new MKLISTInstruction(),
+            'LEN': new LENInstruction(),
         };
     }
 

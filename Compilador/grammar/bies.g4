@@ -36,10 +36,23 @@ paramList
     : ID (',' ID)*
     ;
 
+value
+    : NUMBER                         # NumberValue
+    | STRING                         # StringValue
+    | 'true'                         # TrueValue
+    | 'false'                        # FalseValue
+    | 'null'                         # NullValue
+    ;
+
 // Expresiones aritméticas y paréntesis
 expr
     : expr '**' expr                    # ExponentiationExpr
+    | 'list' '(' (expr (',' expr)*)? ')' # MakeListExpr
+    | 'bool' '(' expr ')'               # BoolExpr
+    | 'len' '(' expr ')'                # LenExpr
+    |'[' (value (',' value)*)? ']'      # ListExpr
     | 'int' '(' expr ')'                # IntExpr
+    | 'str' '(' expr ')'                # StrExpr
     | '!' expr                          # NotExpr
     | expr '&&' expr                    # AndExpr
     | expr '||' expr                    # OrExpr
@@ -71,3 +84,5 @@ STRING : '"' (~["\r\n])* '"';
 WS      : [ \t\r\n]+ -> skip ;
 COMMENT : '//' ~[\r\n]* -> skip ;
 MULTILINE_COMMENT : '/*' .*? '*/' -> skip ;
+
+
