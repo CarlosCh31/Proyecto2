@@ -1,18 +1,35 @@
 #!/usr/bin/env node
+/**
+ * BIESC - Código: 01-1pm
+ * Fecha de entrega: 11/17/2024
+ * Coordinador: Carlos Chavarría Campos
+ *
+ * Integrantes:
+ * - Amanda Esquivel Álvarez    Cédula: 118530735
+ * - María Rodríguez Hernández   Cédula: 118760320
+ * - Hazel Molina Fuentes        Cédula: 305340604
+ * - Carlos Chavarría Campos     Cédula: 117930581
+ *
+ * @file main.js
+ * @description Programa principal para compilar archivos .bies en código ensamblador .basm
+ * utilizando el compilador `biesC`. Este archivo gestiona los argumentos de línea de comandos,
+ * habilita el logging opcional y realiza validaciones de entrada antes de iniciar la compilación.
+ */
 
-// Importa la función compileFile desde biesC.js
 import { compileFile } from './biesC.js';
 import path from 'path';
 import logger from "./Logger.js";
 import fs from 'fs';
 
+/**
+ * Función principal que coordina la compilación de archivos .bies.
+ */
 function main() {
-
     // Lee los argumentos de la consola
     const args = process.argv.slice(2);
     const logEnabled = args.includes('--log') || args.includes('--debug');
 
-// Activa el logging si se usa --log o --debug
+    // Configuración del logger según los argumentos
     if (logEnabled) {
         logger.enable();
         logger.setLevel('info', true);
@@ -21,7 +38,7 @@ function main() {
         logger.disable(); // Desactiva el logger si no se especifica
     }
 
-    // Archivo de instrucciones
+    // Verifica que se haya especificado un archivo de entrada
     const inputFile = args.find(arg => arg.endsWith('.bies'));
     if (!inputFile) {
         console.error("Error: No se especificó un archivo .bies para ejecutar.");
@@ -42,6 +59,7 @@ function main() {
     const errorIndex = args.indexOf('--e');
     const errorFile = errorIndex !== -1 ? args[errorIndex + 1] : null;
 
+    // Intenta compilar el archivo de entrada
     try {
         // Compilación del archivo
         compileFile(inputFile, outputFile);
@@ -59,4 +77,5 @@ function main() {
     }
 }
 
+// Ejecuta la función principal
 main();
