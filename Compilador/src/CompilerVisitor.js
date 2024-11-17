@@ -1,5 +1,6 @@
 // CompilerVisitor.js
 import BiesVisitor from '../gen/biesVisitor.js';
+import logger from "./Logger.js";
 
 export default class CompilerVisitor extends BiesVisitor {
     constructor() {
@@ -10,6 +11,7 @@ export default class CompilerVisitor extends BiesVisitor {
         this.collectedFunctions = [];
         this.functionBindings = {}; // Mapa global para bindings de funciones
         this.variables = {};
+        this.isInPrintOrFunction = false;
     }
 
 
@@ -67,7 +69,7 @@ export default class CompilerVisitor extends BiesVisitor {
         const currentContext = this.getCurrentContext();
 
         const bindingIndex = this.globalBindingCounter++;
-        this.variables[variableName] = { context: currentContext, index: bindingIndex };
+        this.variables[variableName] = { context: currentContext, index: bindingIndex};
 
         // Genera código para almacenar el valor en el binding
         const result = [];
@@ -151,6 +153,8 @@ export default class CompilerVisitor extends BiesVisitor {
         const functionName = ctx.ID().getText();
         const args = ctx.expr();
 
+        this.isInPrintOrFunction = true;
+
         // Obtiene el contexto y el índice de binding de la función desde `functionBindings`
         const binding = this.functionBindings[functionName];
         if (!binding) {
@@ -175,6 +179,8 @@ export default class CompilerVisitor extends BiesVisitor {
         // Genera la instrucción `APP` con la cantidad de argumentos
         output.push(`APP ${args.length}`);
 
+        this.isInPrintOrFunction = false;
+
         return output.join('\n');
     }
 
@@ -188,11 +194,21 @@ export default class CompilerVisitor extends BiesVisitor {
     }
 
     visitAddSubExpr(ctx) {
+
         const left = this.visit(ctx.expr(0));
         const right = this.visit(ctx.expr(1));
-        const op = ctx.op.text === '+' ? 'ADD' : 'SUB';
-        return [...left, ...right, op];
+
+        if (ctx.op.text === '+') {
+            if (this.isInPrintOrFunction) {
+                // Generar instrucciones asegurando que sean cadenas
+                return [...left, ...right, 'CAT'];
+            } else {
+                return [...left, ...right, 'ADD'];
+            }
+        }
+        return [...left, ...right, 'SUB'];
     }
+
 
     visitMulDivExpr(ctx) {
         const left = this.visit(ctx.expr(0));
@@ -213,45 +229,12 @@ export default class CompilerVisitor extends BiesVisitor {
     }
 
     visitPrintStmt(ctx) {
-        const concatCode = this.visit(ctx.concatExpr());
-        return [...concatCode, 'PRN'];
+        logger.debug("Print");
+        this.isInPrintOrFunction = true; // Activar bandera
+        const exprCode = this.visit(ctx.expr());
+        this.isInPrintOrFunction = false; // Desactivar bandera
+        return [...exprCode, 'PRN'].join('\n');
     }
-
-    visitConcatOp(ctx) {
-        const left = this.visit(ctx.concatExpr(0));  // Primer operando de la concatenación
-        const right = this.visit(ctx.expr(1)); // Segundo operando de la concatenación
-
-        const result = [];
-
-        // Procesa la parte izquierda
-        if (Array.isArray(left)) {
-            result.push(...left);
-        } else {
-            result.push(`LDV ${left}`);
-        }
-
-        // Si no es un string, convierte a string antes de concatenar
-        result.push('TOS'); // Convierte el resultado izquierdo a string
-
-        // Procesa la parte derecha
-        if (Array.isArray(right)) {
-            result.push(...right);
-        } else {
-            result.push(`LDV ${right}`);
-        }
-
-        // Si no es un string, convierte a string antes de concatenar
-        result.push('TOS'); // Convierte el resultado derecho a string
-
-        result.push('CAT');  // Usar CAT para concatenar strings
-
-        return result;
-    }
-
-    visitConcatTerm(ctx) {
-        return this.visit(ctx.expr()); // Delegar a la regla expr
-    }
-
 
 }
 

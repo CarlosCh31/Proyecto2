@@ -1,7 +1,13 @@
 $FUN $0 args:0 parent:$0
+LDV 1
+LDV 1
+SUB
+BST 0 1
 LDV "Hello "
+BLD 0 1
+CAT
 LDV "World"
-ADD
+CAT
 PRN
 
 $END $0

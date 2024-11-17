@@ -1,5 +1,6 @@
 $FUN $splash args:1 parent:$0
-BLD 1 0,PRN
+BLD 1 0
+PRN
 RET
 $END $splash
 $FUN $0 args:0 parent:$0
@@ -11,9 +12,9 @@ SUB
 BST 0 1
 LDV "Testing helloworld Version "
 BLD 0 1
-ADD
+CAT
 LDV "***"
-ADD
+CAT
 BLD 0 0
 APP 1
 LDV "Hello World!"

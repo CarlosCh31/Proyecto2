@@ -36,18 +36,6 @@ export default class biesVisitor extends antlr4.tree.ParseTreeVisitor {
 	}
 
 
-	// Visit a parse tree produced by biesParser#ConcatOp.
-	visitConcatOp(ctx) {
-	  return this.visitChildren(ctx);
-	}
-
-
-	// Visit a parse tree produced by biesParser#ConcatTerm.
-	visitConcatTerm(ctx) {
-	  return this.visitChildren(ctx);
-	}
-
-
 	// Visit a parse tree produced by biesParser#paramList.
 	visitParamList(ctx) {
 	  return this.visitChildren(ctx);

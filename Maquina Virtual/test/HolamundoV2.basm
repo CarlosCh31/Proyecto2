@@ -12,9 +12,9 @@ SUB
 BST 0 1
 LDV "Testing helloworld Version "
 BLD 0 1
-ADD
+CAT
 LDV "***"
-ADD
+CAT
 BLD 0 0
 APP 1
 LDV "Hello World!"

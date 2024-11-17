@@ -382,10 +382,7 @@ class SRKInstruction extends Instruction {
 class CATInstruction extends Instruction {
     execute(vm, args) {
         const [H1, H2] = [vm.stack.pop(), vm.stack.pop()];
-        if (typeof H1 !== 'string' || typeof H2 != 'string') {
-            throw new Error(`Ambos valores deben ser string: ${H1} y ${H2}`);
-        }
-        vm.stack.push(H1 + H2);
+        vm.stack.push(String(H2) + String(H1));
     }
 }
 
