@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "generate-parser": "java -jar lib/antlr-4.13.2-complete.jar -Dlanguage=JavaScript -visitor -o gen grammar/bies.g4",
-    "compile": "node main.js"
+    "compile": "node main.js",
+    "test-all": "node run-tests.js"
   },
   "bin": {
     "biesC": "./src/main.js"
