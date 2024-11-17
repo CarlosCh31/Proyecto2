@@ -339,7 +339,7 @@ export default class CompilerVisitor extends BiesVisitor {
 
         logger.debug('LetInExpr Context:', ctx.toStringTree());
 
-        const newContext = this.getCurrentContext();
+        const currentContext = this.getCurrentContext();
 
         const declarations = ctx.constDeclaration();
         const result = [];
@@ -372,8 +372,6 @@ export default class CompilerVisitor extends BiesVisitor {
 
 
     visitConstDeclaration(ctx) {
-        logger.debug('ConstDeclaration Context:', ctx.getText());
-        logger.debug('Expr Exists:', !!ctx.expr());
         const variableName = ctx.ID().getText();
         const currentContext = this.getCurrentContext();
         const bindingIndex = this.globalBindingCounter++;
@@ -393,14 +391,20 @@ export default class CompilerVisitor extends BiesVisitor {
         const result = [];
         let valueCode;
 
-        // Verifica si el nodo tiene un hijo expr
-        if (ctx.expr()) {
+        if (ctx.lambdaExpr()) {
+            // Usa el nombre de la constante como ID de la lambda y pasa el contexto actual como parent
+            valueCode = this.visitLambdaExpr(ctx.lambdaExpr(), variableName, currentContext);
+
+            // Registrar la lambda en functionBindings
+            this.functionBindings[variableName] = { context: currentContext, index: bindingIndex };
+            result.push(`LDF $${variableName}`);
+        } else if (ctx.expr()) {
             valueCode = this.visit(ctx.expr());
         } else {
             throw new Error(`No se encontró una expresión válida para la constante "${variableName}".`);
         }
 
-        // Genera el código correspondiente
+        // Agregar el código generado al resultado
         if (Array.isArray(valueCode)) {
             result.push(...valueCode);
         } else {
@@ -412,6 +416,35 @@ export default class CompilerVisitor extends BiesVisitor {
 
         return result;
     }
+
+
+    visitLambdaExpr(ctx, functionName) {
+        const parentContext = this.getCurrentContext(); // Contexto correcto del padre
+        const newContext = this.getNextContext(); // Contexto para la lambda
+        const paramCount = ctx.paramList() ? ctx.paramList().ID().length : 0;
+
+        const result = [`$FUN $${functionName} args:${paramCount} parent:$${parentContext}`];
+
+        // Procesar parámetros
+        if (ctx.paramList()) {
+            ctx.paramList().ID().forEach((param, index) => {
+                this.variables[param.getText()] = { context: newContext, index, mutable: false };
+            });
+        }
+
+        // Procesar el cuerpo de la lambda
+        const bodyCode = this.visit(ctx.expr());
+        result.push(...bodyCode);
+
+        // Finalizar la función lambda
+        result.push('RET');
+        result.push(`$END $${functionName}`);
+
+        this.releaseContext();
+
+        return result;
+    }
+
 
 }
 

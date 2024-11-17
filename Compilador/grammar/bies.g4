@@ -39,12 +39,14 @@ stmt
     | expr
     ;
 
+constDeclaration
+    : 'const' ID '=' lambdaExpr
+    | 'const' ID '=' expr
+    ;
 
-// Declaración de constantes (solo const)
- constDeclaration
-     : 'const' ID '=' expr
-     ;
-
+lambdaExpr
+    : '(' paramList? ')' '=>' expr
+    ;
 
 // Declaración de `print`
 printStmt

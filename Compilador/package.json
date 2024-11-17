@@ -1,7 +1,7 @@
 {
   "name": "bies-compiler",
   "version": "1.0.0",
-  "description": "Un compilador básico para la máquina virtual BiesVM",
+  "description": "Un compilador para la máquina virtual BiesVM",
   "main": "main.js",
   "type": "module",
   "scripts": {

@@ -46,19 +46,31 @@ async function runTests() {
 }
 
 function compileFile(inputFile, outputFile) {
-    const commandArgs = [biesCCommand, inputFile, '--o', outputFile];
+    // Archivo de errores específico por archivo
+    const errorFile = path.join(compilerPath, 'errors', `errors-${path.basename(inputFile, '.bies')}.log`);
+
+    // Comando para compilar con opciones --o y --e
+    const commandArgs = [biesCCommand, inputFile, '--o', outputFile, '--e', errorFile];
     const result = spawnSync('node', commandArgs, {
         encoding: 'utf-8',
         cwd: compilerPath, // Asegura que el compilador se ejecute en su propio directorio
     });
 
     if (result.error) {
-        throw new Error(result.error.message);
+        throw new Error(`Error de compilación: ${result.error.message}`);
     }
-    if (result.stderr) {
-        console.error(`⚠️ Error:\n${result.stderr}`);
+
+    // Verificar si hubo errores de compilación
+    if (fs.existsSync(errorFile)) {
+        const errorContent = fs.readFileSync(errorFile, 'utf-8').trim();
+        if (errorContent) {
+            console.log(`⚠️ Error registrado en el archivo: ${errorFile}`);
+        } else {
+            fs.unlinkSync(errorFile); // Limpiar si está vacío
+        }
+    } else {
+        console.log(`📄 Compilación exitosa: ${outputFile}`);
     }
-    console.log(`📄 Compilación exitosa: ${outputFile}`);
 }
 
 function executeFileWithMain(basmFile) {
