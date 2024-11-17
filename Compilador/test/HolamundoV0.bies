@@ -1,2 +1,13 @@
+// HolamundoV0.basm
+// Test Case: Programa básico para imprimir mensajes en consola
+// Integrantes:
+// - Amanda Esquivel Álvarez    Cédula: 118530735
+// - María Rodríguez Hernández   Cédula: 118760320
+// - Hazel Molina Fuentes        Cédula: 305340604
+// - Carlos Chavarría Campos     Cédula: 117930581
+
+// Imprime un mensaje de prueba en consola
 print("Testing helloworld Version 0 ***")
-print("Hello World!") 
+
+// Imprime el mensaje "Hello World!"
+print("Hello World!")

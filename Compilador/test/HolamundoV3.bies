@@ -1,5 +1,22 @@
+// HolamundoV3.basm
+// Test Case: Programa para imprimir mensajes dinámicos con funciones
+// Integrantes:
+// - Amanda Esquivel Álvarez    Cédula: 118530735
+// - María Rodríguez Hernández   Cédula: 118760320
+// - Hazel Molina Fuentes        Cédula: 305340604
+// - Carlos Chavarría Campos     Cédula: 117930581
+
+// Define la función `splash` que imprime un mensaje recibido como argumento
 let splash = (msg) => print(msg)
+
+// Define la función `greetings` que retorna un mensaje de saludo
 let greetings = () => "Hello World!"
+
+// Calcula la versión como una expresión aritmética
 let version = (4 + 1 - 2)
+
+// Llama a la función `splash` con un mensaje dinámico que incluye la versión
 splash("Testing helloworld Version " + version + " ***")
+
+// Imprime el mensaje retornado por la función `greetings`
 print(greetings())
