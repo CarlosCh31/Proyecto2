@@ -50,6 +50,24 @@ export default class biesListener extends antlr4.tree.ParseTreeListener {
 	}
 
 
+	// Enter a parse tree produced by biesParser#letInExpr.
+	enterLetInExpr(ctx) {
+	}
+
+	// Exit a parse tree produced by biesParser#letInExpr.
+	exitLetInExpr(ctx) {
+	}
+
+
+	// Enter a parse tree produced by biesParser#letDeclaration.
+	enterLetDeclaration(ctx) {
+	}
+
+	// Exit a parse tree produced by biesParser#letDeclaration.
+	exitLetDeclaration(ctx) {
+	}
+
+
 	// Enter a parse tree produced by biesParser#paramList.
 	enterParamList(ctx) {
 	}

@@ -1,14 +1,18 @@
 $FUN $0 args:0 parent:$0
+$FUN $lambda_1 args:2 parent:$1
 LDV 1
+BST 1 0
+LDV 2
+BST 1 1
+BLD 1 0
+BLD 1 1
+ADD
+RET
+$END $lambda_1
+LDF $lambda_1
 LDV 1
-SUB
-BST 0 1
-LDV "Hello "
-BLD 0 1
-CAT
-LDV "World"
-CAT
-PRN
+LDV 2
+APP 2
 
 $END $0
 INI $0

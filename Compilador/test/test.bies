@@ -1,2 +1,1 @@
-let version = 1 - 1
-print("Hello " + version + "World")
+let {const x = 1 const y = 2} in x + y

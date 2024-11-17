@@ -33,11 +33,12 @@ export default class CompilerVisitor extends BiesVisitor {
         let functionDeclarations = [];
         let mainBody = [`$FUN $0 args:0 parent:$0`];
 
-        let bindingIndex = this.globalBindingCounter++; // Índice único para todas las variables globales
         for (let i = 0; i < ctx.children.length; i++) {
             const child = ctx.children[i];
 
             if (child.constructor.name === 'FunctionDeclarationContext') {
+                let bindingIndex = this.globalBindingCounter++;
+                logger.debug("Binding index Program: ",bindingIndex);
                 const functionCode = this.visit(child);
                 functionDeclarations.push(...functionCode);
 
@@ -45,7 +46,6 @@ export default class CompilerVisitor extends BiesVisitor {
                 mainBody.push(`LDF $${functionName}`);
                 mainBody.push(`BST 0 ${bindingIndex}`);
                 this.functionBindings[functionName] = { context: 0, index: bindingIndex };
-                bindingIndex++;
             } else {
                 const exprCode = this.visit(child);
                 if (Array.isArray(exprCode)) {
@@ -69,6 +69,8 @@ export default class CompilerVisitor extends BiesVisitor {
         const currentContext = this.getCurrentContext();
 
         const bindingIndex = this.globalBindingCounter++;
+        logger.debug("Binding index variable: ",bindingIndex);
+
         this.variables[variableName] = { context: currentContext, index: bindingIndex};
 
         // Genera código para almacenar el valor en el binding
@@ -150,10 +152,22 @@ export default class CompilerVisitor extends BiesVisitor {
 
 
     visitFunctionCall(ctx) {
-        const functionName = ctx.ID().getText();
-        const args = ctx.expr();
+        let functionName;
+        if (ctx.ID){
+            functionName = ctx.ID().getText();
+        } else if (ctx.children && ctx.children[0]) {
+            functionName = ctx.children[0].getText();
+
+            functionName = functionName.replace(/\(\)$/, '');
+        } else {
+            functionName = null;
+        }
+        logger.debug("FunctionName: ", functionName);
+        const args = ctx.expr ? ctx.expr() : [];
 
         this.isInPrintOrFunction = true;
+
+        const greetings = 'greetings';
 
         // Obtiene el contexto y el índice de binding de la función desde `functionBindings`
         const binding = this.functionBindings[functionName];
@@ -181,7 +195,7 @@ export default class CompilerVisitor extends BiesVisitor {
 
         this.isInPrintOrFunction = false;
 
-        return output.join('\n');
+        return output;
     }
 
     visitFunctionCallExpr(ctx) {

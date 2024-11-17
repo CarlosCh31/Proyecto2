@@ -146,7 +146,7 @@ class ADDInstruction extends Instruction {
         if (typeof N !== 'number' || typeof M !== 'number') {
             throw new Error(`Los operandos deben ser numeros: ${N}, ${M}`);
         }
-        vm.stack.push(N+M);
+        vm.stack.push(M+N);
     }
 }
 
@@ -160,7 +160,7 @@ class SUBInstruction extends Instruction {
         if (typeof N !== 'number' || typeof M !== 'number') {
             throw new Error(`Los operandos deben ser numeros: ${N}, ${M}`);
         }
-        vm.stack.push(N-M);
+        vm.stack.push(M-N);
     }
 }
 
@@ -187,10 +187,10 @@ class DIVInstruction extends Instruction {
         const [N, M] = [vm.stack.pop(), vm.stack.pop()];
         if (typeof N !== 'number' || typeof M !== 'number') {
             throw new Error(`Los operandos deben ser numeros: ${N}, ${M}`);
-        } else if (M === 0) {
+        } else if (N === 0) {
             throw new Error("Division por cero no existe");
         }
-        vm.stack.push(N/M);
+        vm.stack.push(M/N);
     }
 }
 
