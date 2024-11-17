@@ -2,7 +2,7 @@ grammar bies;
 
 // Regla de inicio para reconocer funciones y expresiones
 program
-    : (functionDeclaration | variableDeclaration | assignment | printStmt | functionCall)* EOF
+    : (functionDeclaration | variableDeclaration | assignment | printStmt | functionCall | letInExpr)* EOF
     ;
 
 // Declaración de variables
@@ -24,6 +24,25 @@ functionDeclaration
 functionCall
     : ID '(' (expr (',' expr)*)? ')'
     ;
+
+// Expresión `let-in` con soporte para declaraciones en el bloque `in`
+letInExpr
+    : 'let' '{' constDeclaration* '}' 'in' '{' (variableDeclaration | assignment | printStmt | expr | functionCall)* '}'
+    ;
+
+
+// Declaración de constantes (solo const)
+ constDeclaration
+     : 'const' ID '=' lambdaExpr
+     | 'const' ID '=' expr
+     ;
+
+ // Expresión lambda
+ lambdaExpr
+     : '(' paramList? ')' '=>' expr
+     ;
+
+
 
 // Declaración de `print`
 printStmt

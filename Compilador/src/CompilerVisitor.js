@@ -247,7 +247,7 @@ export default class CompilerVisitor extends BiesVisitor {
                 // Generar instrucciones asegurando que sean cadenas
                 return [...left, ...right, 'CAT'];
             } else {
-                return [...left, ...right, 'ADD'];
+                return [...left, ...right, 'ADD'].join('\n');
             }
         }
         return [...left, ...right, 'SUB'];
@@ -279,6 +279,67 @@ export default class CompilerVisitor extends BiesVisitor {
         this.isInPrintOrFunction = false; // Desactivar bandera
         return [...exprCode, 'PRN'].join('\n');
     }
+
+    visitLetInExpr(ctx) {
+        const newContext = this.getCurrentContext()
+
+        const declarations = ctx.constDeclaration();
+        const result = [];
+
+        for (const declaration of declarations) {
+            const declarationCode = this.visit(declaration);
+            result.push(...declarationCode);
+        }
+
+        const expr = this.visit(ctx.expr());
+        if (Array.isArray(expr)) {
+            result.push(...expr);
+        } else {
+            result.push(`LDV ${expr}`);
+        }
+
+        return result;
+    }
+
+    visitConstDeclaration(ctx) {
+        const variableName = ctx.ID().getText(); // Nombre de la variable
+        const currentContext = this.getCurrentContext(); // Contexto actual
+        const bindingIndex = this.globalBindingCounter++; // Índice único para el binding
+
+        // Verifica si la constante ya existe en el contexto actual
+        if (this.variables[variableName] && this.variables[variableName].context === currentContext) {
+            throw new Error(`La constante "${variableName}" ya está declarada en este contexto.`);
+        }
+
+        this.variables[variableName] = {
+            context: currentContext,
+            index: bindingIndex,
+            mutable: false // `const` es siempre inmutable
+        };
+
+        // Genera código para el valor asignado
+        const result = [];
+        if (ctx.lambdaExpr()) {
+            // Si es una lambda, genera su código
+            const lambdaCode = this.visit(ctx.lambdaExpr());
+            result.push(...lambdaCode);
+        } else {
+            // Si es una expresión normal, genera su código
+            const valueCode = this.visit(ctx.expr());
+            if (Array.isArray(valueCode)) {
+                result.push(...valueCode);
+            } else {
+                result.push(`LDV ${valueCode}`);
+            }
+        }
+
+        // Almacena el resultado en el binding
+        result.push(`BST ${currentContext} ${bindingIndex}`);
+        return result;
+    }
+
+
+
 
 }
 
