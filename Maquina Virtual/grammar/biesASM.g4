@@ -66,6 +66,7 @@ INSTRUCTION         : 'INI'
                     | 'PRN'
                     | 'LEN'
                     | 'MKLIST'
+                    | 'INPUT'
                     ;
 
 ARG                 : '$' INT | '$' ID | ID;  // Reconoce $ seguido de INT o ID

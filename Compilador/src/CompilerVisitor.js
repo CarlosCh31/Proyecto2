@@ -342,8 +342,9 @@ export default class CompilerVisitor extends BiesVisitor {
         return ['LDV []']; // Representa null como una lista vacía
     }
     visitInputExpr(ctx) {
-        return ['INPUT']; // Genera la instrucción para pedir entrada al usuario
+        return ['INPUT']; // Genera la instrucción INPUT
     }
+
     visitIntFunctionCall(ctx) {
         const value = this.visit(ctx.expr()); // Visita la expresión que se convertirá
         return [...value, 'CST number'];     // Genera la instrucción para conversión a número

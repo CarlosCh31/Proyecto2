@@ -64,7 +64,7 @@ expr
     | 'true'                            # TrueExpr
     | 'false'                           # FalseExpr
     | 'null'                            # NullExpr
-    | 'input'                           # InputExpr
+    | 'input' '(' ')'                   # InputExpr
     | expr op=('*' | '/') expr          # MulDivExpr
     | expr op=('+' | '-') expr          # AddSubExpr
     | '(' expr ')'                      # ParenExpr

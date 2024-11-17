@@ -12,6 +12,7 @@
 
 import logger from './Logger.js';
 import promptSync from 'prompt-sync';
+const prompt = promptSync();
 /**
  *
  * Clase Instruction que vamos a utilizar como una
@@ -802,11 +803,12 @@ class PRNInstruction extends Instruction {
  */
 class INPUTInstruction extends Instruction {
     execute(vm, args) {
-        const prompt = promptSync(); // Inicializa el prompt
-        const input = prompt('Ingrese un valor: '); // Solicita entrada al usuario
-        vm.stack.push(input); // Apila el valor ingresado
+        const userInput = prompt('> '); // Solicita el valor al usuario
+        vm.stack.push(userInput);      // Empuja la entrada al stack
+        logger.debug(`Valor ingresado: ${userInput}`); // Depuración opcional
     }
 }
+
 
 /**
  * Clase factory para crear el objeto y devolverlo

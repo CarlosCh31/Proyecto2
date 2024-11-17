@@ -1,15 +1,5 @@
 $FUN $0 args:0 parent:$0
-LDV 1
-LDV 2
-LDV 3
-MKLIST 3
-PRN
-LDV 1
-LDV "hello"
-LDV 42
-MKLIST 3
-PRN
-MKLIST 0
+INPUT
 PRN
 
 $END $0
