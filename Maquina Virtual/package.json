@@ -13,7 +13,8 @@
     "generate-docs": "jsdoc -c jsdoc.json"
   },
   "dependencies": {
-    "antlr4": "^4.13.2"
+    "antlr4": "^4.13.2",
+    "prompt-sync": "^4.2.0"
   },
   "devDependencies": {
     "jsdoc": "^4.0.3",

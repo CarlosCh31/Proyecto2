@@ -185,6 +185,10 @@ export default class CompilerVisitor extends BiesVisitor {
         let functionName;
         if (ctx.ID){
             functionName = ctx.ID().getText();
+            if (functionName === 'int') {
+                // Manejo específico de int()
+                return this.visitIntFunctionCall(ctx);
+            }
         } else if (ctx.children && ctx.children[0]) {
             functionName = ctx.children[0].getText();
 
@@ -272,12 +276,81 @@ export default class CompilerVisitor extends BiesVisitor {
         return [`LDV "${text.slice(1, -1)}"`]; // Mantiene las comillas dobles
     }
 
+    visitExponentiationExpr(ctx) {
+        const base = this.visit(ctx.expr(0));      // Visita la base
+        const exponent = this.visit(ctx.expr(1)); // Visita el exponente
+
+        return [...base, ...exponent, 'EXP']; // Instrucción para exponenciación
+    }
     visitPrintStmt(ctx) {
         logger.debug("Print");
         this.isInPrintOrFunction = true; // Activar bandera
         const exprCode = this.visit(ctx.expr());
         this.isInPrintOrFunction = false; // Desactivar bandera
         return [...exprCode, 'PRN'].join('\n');
+    }
+    visitNotExpr(ctx) {
+        const value = this.visit(ctx.expr()); // Visita la expresión a negar
+        return [...value, 'NOT'];            // Genera la instrucción NOT
+    }
+    visitAndExpr(ctx) {
+        const left = this.visit(ctx.expr(0));   // Visita el operando izquierdo
+        const right = this.visit(ctx.expr(1)); // Visita el operando derecho
+        return [...left, ...right, 'AND'];     // Genera la instrucción AND
+    }
+    visitOrExpr(ctx) {
+        const left = this.visit(ctx.expr(0));   // Visita el operando izquierdo
+        const right = this.visit(ctx.expr(1)); // Visita el operando derecho
+        return [...left, ...right, 'OR'];      // Genera la instrucción OR
+    }
+    visitNotEqualExpr(ctx) {
+        const left = this.visit(ctx.expr(0));   // Visita el operando izquierdo
+        const right = this.visit(ctx.expr(1)); // Visita el operando derecho
+        return [...left, ...right, 'EQ', 'NOT']; // Compara igualdad y aplica NOT
+    }
+
+    visitGreaterThanExpr(ctx) {
+        const left = this.visit(ctx.expr(0));   // Visita el operando izquierdo
+        const right = this.visit(ctx.expr(1)); // Visita el operando derecho
+        return [...left, ...right, 'GT'];
+    }
+
+    visitGreaterThanOrEqualExpr(ctx) {
+        const left = this.visit(ctx.expr(0));   // Visita el operando izquierdo
+        const right = this.visit(ctx.expr(1)); // Visita el operando derecho
+        return [...left, ...right, 'GTE'];
+    }
+
+    visitLessThanExpr(ctx) {
+        const left = this.visit(ctx.expr(0));   // Visita el operando izquierdo
+        const right = this.visit(ctx.expr(1)); // Visita el operando derecho
+        return [...left, ...right, 'LT'];
+    }
+    visitLessThanOrEqualExpr(ctx) {
+        const left = this.visit(ctx.expr(0));   // Visita el operando izquierdo
+        const right = this.visit(ctx.expr(1)); // Visita el operando derecho
+        return [...left, ...right, 'LTE'];
+    }
+    visitTrueExpr(ctx) {
+        return ['LDV 1']; // true se representa como 1
+    }
+
+    visitFalseExpr(ctx) {
+        return ['LDV 0']; // false se representa como 0
+    }
+    visitNullExpr(ctx) {
+        return ['LDV []']; // Representa null como una lista vacía
+    }
+    visitInputExpr(ctx) {
+        return ['INPUT']; // Genera la instrucción para pedir entrada al usuario
+    }
+    visitIntFunctionCall(ctx) {
+        const value = this.visit(ctx.expr()); // Visita la expresión que se convertirá
+        return [...value, 'CST number'];     // Genera la instrucción para conversión a número
+    }
+    visitIntExpr(ctx) {
+        const value = this.visit(ctx.expr()); // Visita la expresión dentro de int()
+        return [...value, 'CST number'];     // Genera la instrucción para conversión a número
     }
 
 }

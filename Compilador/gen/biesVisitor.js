@@ -30,8 +30,14 @@ export default class biesVisitor extends antlr4.tree.ParseTreeVisitor {
 	}
 
 
-	// Visit a parse tree produced by biesParser#functionCall.
-	visitFunctionCall(ctx) {
+	// Visit a parse tree produced by biesParser#CustomFunctionCall.
+	visitCustomFunctionCall(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
+	// Visit a parse tree produced by biesParser#IntFunctionCall.
+	visitIntFunctionCall(ctx) {
 	  return this.visitChildren(ctx);
 	}
 
@@ -48,8 +54,74 @@ export default class biesVisitor extends antlr4.tree.ParseTreeVisitor {
 	}
 
 
+	// Visit a parse tree produced by biesParser#AndExpr.
+	visitAndExpr(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
 	// Visit a parse tree produced by biesParser#StringExpr.
 	visitStringExpr(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
+	// Visit a parse tree produced by biesParser#TrueExpr.
+	visitTrueExpr(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
+	// Visit a parse tree produced by biesParser#GreaterThanExpr.
+	visitGreaterThanExpr(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
+	// Visit a parse tree produced by biesParser#ExponentiationExpr.
+	visitExponentiationExpr(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
+	// Visit a parse tree produced by biesParser#NotEqualExpr.
+	visitNotEqualExpr(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
+	// Visit a parse tree produced by biesParser#PrintStmtExpr.
+	visitPrintStmtExpr(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
+	// Visit a parse tree produced by biesParser#OrExpr.
+	visitOrExpr(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
+	// Visit a parse tree produced by biesParser#FalseExpr.
+	visitFalseExpr(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
+	// Visit a parse tree produced by biesParser#NullExpr.
+	visitNullExpr(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
+	// Visit a parse tree produced by biesParser#NegateExpr.
+	visitNegateExpr(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
+	// Visit a parse tree produced by biesParser#LessThanOrEqualExpr.
+	visitLessThanOrEqualExpr(ctx) {
 	  return this.visitChildren(ctx);
 	}
 
@@ -72,8 +144,26 @@ export default class biesVisitor extends antlr4.tree.ParseTreeVisitor {
 	}
 
 
+	// Visit a parse tree produced by biesParser#InputExpr.
+	visitInputExpr(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
 	// Visit a parse tree produced by biesParser#IdentifierExpr.
 	visitIdentifierExpr(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
+	// Visit a parse tree produced by biesParser#IntExpr.
+	visitIntExpr(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
+	// Visit a parse tree produced by biesParser#NotExpr.
+	visitNotExpr(ctx) {
 	  return this.visitChildren(ctx);
 	}
 
@@ -84,20 +174,20 @@ export default class biesVisitor extends antlr4.tree.ParseTreeVisitor {
 	}
 
 
+	// Visit a parse tree produced by biesParser#LessThanExpr.
+	visitLessThanExpr(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
 	// Visit a parse tree produced by biesParser#AddSubExpr.
 	visitAddSubExpr(ctx) {
 	  return this.visitChildren(ctx);
 	}
 
 
-	// Visit a parse tree produced by biesParser#PrintStmtExpr.
-	visitPrintStmtExpr(ctx) {
-	  return this.visitChildren(ctx);
-	}
-
-
-	// Visit a parse tree produced by biesParser#NegateExpr.
-	visitNegateExpr(ctx) {
+	// Visit a parse tree produced by biesParser#GreaterThanOrEqualExpr.
+	visitGreaterThanOrEqualExpr(ctx) {
 	  return this.visitChildren(ctx);
 	}
 

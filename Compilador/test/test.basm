@@ -1,18 +1,7 @@
 $FUN $0 args:0 parent:$0
-LDV 10
+LDV "666"
+CST number
 BST 0 0
-BLD 0 0
-LDV 5
-ADD
-BLD 0 0
-LDV 20
-BST 0 1
-BLD 0 1
-LDV 10
-SUB
-BLD 0 1
-LDV 30
-BST 0 2
 BLD 0 0
 PRN
 

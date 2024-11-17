@@ -22,7 +22,8 @@ functionDeclaration
 
 // Llamado de funciones
 functionCall
-    : ID '(' (expr (',' expr)*)? ')'
+    : ID '(' (expr (',' expr)*)? ')'    # CustomFunctionCall
+    | 'int' '(' expr ')'                # IntFunctionCall
     ;
 
 // Declaración de `print`
@@ -37,7 +38,21 @@ paramList
 
 // Expresiones aritméticas y paréntesis
 expr
-    : expr op=('*' | '/') expr          # MulDivExpr
+    : expr '**' expr                    # ExponentiationExpr
+    | 'int' '(' expr ')'                # IntExpr
+    | '!' expr                          # NotExpr
+    | expr '&&' expr                    # AndExpr
+    | expr '||' expr                    # OrExpr
+    | expr '!=' expr                    # NotEqualExpr
+    | expr '>' expr                     # GreaterThanExpr
+    | expr '>=' expr                    # GreaterThanOrEqualExpr
+    | expr '<' expr                     # LessThanExpr
+    | expr '<=' expr                    # LessThanOrEqualExpr
+    | 'true'                            # TrueExpr
+    | 'false'                           # FalseExpr
+    | 'null'                            # NullExpr
+    | 'input'                           # InputExpr
+    | expr op=('*' | '/') expr          # MulDivExpr
     | expr op=('+' | '-') expr          # AddSubExpr
     | '(' expr ')'                      # ParenExpr
     | '-' expr                          # NegateExpr
@@ -50,6 +65,7 @@ expr
 
 // Definición de tokens
 ID      : [a-zA-Z_][a-zA-Z_0-9]* ;
+BOOLEAN : 'true' | 'false';
 NUMBER  : [0-9]+ ;
 STRING : '"' (~["\r\n])* '"';
 WS      : [ \t\r\n]+ -> skip ;

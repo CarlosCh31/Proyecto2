@@ -11,7 +11,7 @@
  */
 
 import logger from './Logger.js';
-
+import promptSync from 'prompt-sync';
 /**
  *
  * Clase Instruction que vamos a utilizar como una
@@ -115,6 +115,20 @@ class BSTInstruction extends Instruction {
             vm.scope[E] = {}
         }
         vm.scope[E][K] = vm.stack.pop();
+    }
+}
+/**
+ * Clase de la instruccion EXP que implementa
+ * un exponencial
+ */
+class EXPInstruction extends Instruction {
+    execute(vm, args) {
+        const exponent = vm.stack.pop(); // Obtiene el exponente
+        const base = vm.stack.pop();    // Obtiene la base
+        if (typeof base !== 'number' || typeof exponent !== 'number') {
+            throw new Error(`Los operandos deben ser números: ${base}, ${exponent}`);
+        }
+        vm.stack.push(Math.pow(base, exponent)); // Calcula base^exponent
     }
 }
 
@@ -251,7 +265,7 @@ class GTInstruction extends Instruction {
 class GTEInstruction extends Instruction {
     execute(vm, args) {
         const [N, M] = [vm.stack.pop(), vm.stack.pop()];
-        vm.stack.push((N >= M) ? 1 : 0);
+        vm.stack.push((M >= N) ? 1 : 0);
     }
 }
 
@@ -262,7 +276,7 @@ class GTEInstruction extends Instruction {
 class LTInstruction extends Instruction {
     execute(vm, args) {
         const [N, M] = [vm.stack.pop(), vm.stack.pop()];
-        vm.stack.push((N < M) ? 1 : 0);
+        vm.stack.push((M < N) ? 1 : 0);
     }
 }
 
@@ -273,10 +287,9 @@ class LTInstruction extends Instruction {
 class LTEInstruction extends Instruction {
     execute(vm, args) {
         const [N, M] = [vm.stack.pop(), vm.stack.pop()];
-        vm.stack.push((N <= M) ? 1 : 0);
+        vm.stack.push((M <= N) ? 1 : 0);
     }
 }
-
 /**
  * Clase de la instruccion AND que realiza la logica
  * basica
@@ -314,10 +327,13 @@ class XORInstruction extends Instruction {
  * Clase de la instruccion NOT que devuelve el
  * contrario del valor ingresado
  */
-class NOTInstruction extends  Instruction {
+class NOTInstruction extends Instruction {
     execute(vm, args) {
         const value = vm.stack.pop();
-        vm.stack.push(!value ? value : 0);
+        if (typeof value !== 'number') {
+            throw new Error(`Debe ser un número: ${value}`);
+        }
+        vm.stack.push(value ? 0 : 1); // Invierte el valor
     }
 }
 
@@ -646,17 +662,26 @@ class CSTInstruction extends Instruction {
         const [castType] = args;
         const value = vm.stack.pop();
 
-        if (castType === 'number' && typeof value === 'number') {
-            vm.stack.push(value);
-        } else if (castType === 'string' && typeof value === 'string') {
-            vm.stack.push(value);
-        } else if (castType === 'list' && Array.isArray(value)) {
-            vm.stack.push(value);
+        if (castType === 'number') {
+            const convertedValue = Number(value); // Intenta convertir a número
+            if (isNaN(convertedValue)) {
+                throw new Error(`Fallo la conversión a número: "${value}" no es válido`);
+            }
+            vm.stack.push(convertedValue);
+        } else if (castType === 'string') {
+            vm.stack.push(String(value)); // Convierte a string
+        } else if (castType === 'list') {
+            if (Array.isArray(value)) {
+                vm.stack.push(value);
+            } else {
+                vm.stack.push([value]); // Envuelve en una lista
+            }
         } else {
-            throw new Error(`Fallo el tipo de casting: esperado ${castType}, obtenido ${typeof value}`);
+            throw new Error(`Tipo de casting no soportado: ${castType}`);
         }
     }
 }
+
 
 /**
  * Clase de La instruccion INO que verifica
@@ -691,6 +716,16 @@ class PRNInstruction extends Instruction {
         }
         const value = vm.stack.pop();
         console.log(value);
+    }
+}
+/**
+ * Clase input para permitir al usuario ingresar informacion
+ */
+class INPUTInstruction extends Instruction {
+    execute(vm, args) {
+        const prompt = promptSync(); // Inicializa el prompt
+        const input = prompt('Ingrese un valor: '); // Solicita entrada al usuario
+        vm.stack.push(input); // Apila el valor ingresado
     }
 }
 
@@ -741,7 +776,9 @@ class InstructionFactory {
             'RET': new RETInstruction(),
             'CST': new CSTInstruction(),
             'INO': new INOInstruction(),
-            'PRN': new PRNInstruction()
+            'PRN': new PRNInstruction(),
+            'EXP': new EXPInstruction(),
+            'INPUT': new INPUTInstruction()
         };
     }
 

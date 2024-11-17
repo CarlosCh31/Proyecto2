@@ -1,7 +1,2 @@
-var x = 10
-x = x + 5   // Asignación válida para variables declaradas con `var` o `let`
-let y = 20
-y = y - 10
-const z = 30
-// z = z + 10 // Esto debería lanzar un error en tiempo de ejecución
-print(x)
+let result = int("666")
+print(result)
