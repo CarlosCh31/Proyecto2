@@ -1,18 +1,20 @@
 $FUN $0 args:0 parent:$0
-$FUN $lambda_1 args:2 parent:$1
-LDV 1
-BST 1 0
-LDV 2
-BST 1 1
-BLD 1 0
-BLD 1 1
+LDV 10
+BST 0 0
+BLD 0 0
+LDV 5
 ADD
-RET
-$END $lambda_1
-LDF $lambda_1
-LDV 1
-LDV 2
-APP 2
+BLD 0 0
+LDV 20
+BST 0 1
+BLD 0 1
+LDV 10
+SUB
+BLD 0 1
+LDV 30
+BST 0 2
+BLD 0 0
+PRN
 
 $END $0
 INI $0

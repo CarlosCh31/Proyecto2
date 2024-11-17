@@ -2,12 +2,17 @@ grammar bies;
 
 // Regla de inicio para reconocer funciones y expresiones
 program
-    : (functionDeclaration | variableDeclaration | printStmt | functionCall)* EOF
+    : (functionDeclaration | variableDeclaration | assignment | printStmt | functionCall)* EOF
     ;
 
 // Declaración de variables
 variableDeclaration
-    : 'let' ID '=' expr
+    : ('let' | 'const' | 'var') ID '=' expr
+    ;
+
+// Asignación de variables
+assignment
+    : ID '=' expr
     ;
 
 // Declaración de funciones
@@ -46,5 +51,7 @@ expr
 // Definición de tokens
 ID      : [a-zA-Z_][a-zA-Z_0-9]* ;
 NUMBER  : [0-9]+ ;
-STRING  : '"' .*? '"';
+STRING : '"' (~["\r\n])* '"';
 WS      : [ \t\r\n]+ -> skip ;
+COMMENT : '//' ~[\r\n]* -> skip ;
+MULTILINE_COMMENT : '/*' .*? '*/' -> skip ;

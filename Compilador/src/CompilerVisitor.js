@@ -63,6 +63,7 @@ export default class CompilerVisitor extends BiesVisitor {
 
     visitVariableDeclaration(ctx) {
         const variableName = ctx.ID().getText();  // Nombre de la variable
+        const declarationType = ctx.getChild(0).getText();
         const value = this.visit(ctx.expr());     // Código de la expresión asignada
 
         // Obtiene el contexto actual
@@ -71,7 +72,12 @@ export default class CompilerVisitor extends BiesVisitor {
         const bindingIndex = this.globalBindingCounter++;
         logger.debug("Binding index variable: ",bindingIndex);
 
-        this.variables[variableName] = { context: currentContext, index: bindingIndex};
+        this.variables[variableName] = {
+            context: currentContext,
+            index: bindingIndex,
+            type: declarationType, // Guardamos el tipo de declaración ('const', 'var', o 'let')
+            mutable: declarationType !== 'const' // Solo 'const' es inmutable
+        };
 
         // Genera código para almacenar el valor en el binding
         const result = [];
@@ -81,6 +87,30 @@ export default class CompilerVisitor extends BiesVisitor {
             result.push(`LDV ${value}`);
         }
         result.push(`BST ${currentContext} ${bindingIndex}`); // Usa el contexto y el índice únicos
+
+        return result;
+    }
+
+    visitAssignment(ctx) {
+        const variableName = ctx.ID().getText();
+        const value = this.visit(ctx.expr()); // Código de la expresión asignada
+
+        const variable = this.variables[variableName];
+        if (!variable) {
+            throw new Error(`Variable "${variableName}" no está definida.`);
+        }
+
+        if (!variable.mutable) {
+            throw new Error(`La constante "${variableName}" no puede ser reasignada.`);
+        }
+
+        const result = [];
+        if (Array.isArray(value)) {
+            result.push(...value); // Código para evaluar la expresión
+        } else {
+            result.push(`LDV ${value}`);
+        }
+        result.push(`BLD ${variable.context} ${variable.index}`); // Actualiza el valor en el binding
 
         return result;
     }
