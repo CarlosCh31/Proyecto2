@@ -1,15 +1,19 @@
 import { spawnSync } from 'child_process';
 import { readdir } from 'fs/promises';
 import path from 'path';
-import biesVM from '../Maquina Virtual/src/biesVM.js';
-import fs from "fs";
+import fs from 'fs';
 
-const testFolder = path.resolve('./test');
-const biesCCommand = path.resolve('./src/main.js');
+const compilerPath = path.resolve('./'); // Ruta al proyecto del compilador
+const vmPath = path.resolve('../Maquina Virtual'); // Ruta al proyecto de la máquina virtual
+const testFolder = path.join(compilerPath, 'test'); // Carpeta general de test
+const biesFolder = path.join(testFolder, 'bies'); // Subcarpeta de archivos .bies
+const basmFolder = path.join(testFolder, 'basm'); // Subcarpeta de archivos .basm
+const biesCCommand = path.join(compilerPath, 'src/main.js');
+const vmMainCommand = path.join(vmPath, 'main.js');
 
 async function runTests() {
     try {
-        const files = await readdir(testFolder);
+        const files = await readdir(biesFolder);
         const biesFiles = files.filter(file => file.endsWith('.bies'));
 
         if (biesFiles.length === 0) {
@@ -22,14 +26,14 @@ async function runTests() {
         console.log('\nComenzando las pruebas...\n');
 
         for (const [index, file] of biesFiles.entries()) {
-            const filePath = path.join(testFolder, file);
-            const basmFile = filePath.replace('.bies', '.basm');
+            const filePath = path.join(biesFolder, file);
+            const basmFile = path.join(basmFolder, file.replace('.bies', '.basm')); // Archivo .basm generado
 
             console.log(`\n🔄 [${index + 1}/${biesFiles.length}] Compilando archivo: ${file}`);
-            await compileFile(filePath, basmFile);
+            compileFile(filePath, basmFile);
 
             console.log(`▶️ Ejecutando en máquina virtual: ${basmFile}`);
-            const vmOutput = executeFileInVM(basmFile);
+            const vmOutput = executeFileWithMain(basmFile);
 
             console.log(`🖥️ Salida de la máquina virtual para ${file}:\n${vmOutput}`);
             console.log(`✅ Prueba completada para: ${file}\n`);
@@ -43,7 +47,10 @@ async function runTests() {
 
 function compileFile(inputFile, outputFile) {
     const commandArgs = [biesCCommand, inputFile, '--o', outputFile];
-    const result = spawnSync('node', commandArgs, { encoding: 'utf-8' });
+    const result = spawnSync('node', commandArgs, {
+        encoding: 'utf-8',
+        cwd: compilerPath, // Asegura que el compilador se ejecute en su propio directorio
+    });
 
     if (result.error) {
         throw new Error(result.error.message);
@@ -54,24 +61,27 @@ function compileFile(inputFile, outputFile) {
     console.log(`📄 Compilación exitosa: ${outputFile}`);
 }
 
-function executeFileInVM(basmFile) {
-    const instructions = parseBasmFile(basmFile);
-    const vm = new biesVM();
-    vm.execute(instructions);
+function executeFileWithMain(basmFile) {
+    // Calcular la ruta relativa desde vmPath al archivo .basm
+    const relativeBasmPath = path.relative(vmPath, basmFile);
 
-    // Retornar la salida almacenada en `vm.output`
-    return vm.output.length > 0 ? vm.output.join('\n') : '<Sin salida capturada>';
+    // Usar el comando biesVM con la ruta relativa
+    const commandArgs = ['biesVM', relativeBasmPath];
+    const result = spawnSync(commandArgs[0], commandArgs.slice(1), {
+        encoding: 'utf-8',
+        cwd: vmPath, // Cambia el directorio de trabajo a la máquina virtual
+        shell: true, // Asegura que pueda encontrar comandos globales como biesVM
+    });
+
+    if (result.error) {
+        throw new Error(result.error.message);
+    }
+    if (result.stderr) {
+        console.error(`⚠️ Error en la ejecución:\n${result.stderr}`);
+    }
+    return result.stdout.trim();
 }
 
-function parseBasmFile(basmFile) {
-    const content = fs.readFileSync(basmFile, 'utf-8');
-    return content
-        .trim()
-        .split('\n')
-        .map(line => {
-            const tokens = line.split(' ');
-            return [tokens[0], ...tokens.slice(1)];
-        });
-}
+
 
 runTests();

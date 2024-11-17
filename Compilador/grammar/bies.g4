@@ -27,21 +27,23 @@ functionCall
 
 // Expresión `let-in` con soporte para declaraciones en el bloque `in`
 letInExpr
-    : 'let' '{' constDeclaration* '}' 'in' '{' (variableDeclaration | assignment | printStmt | expr | functionCall)* '}'
+    : 'let' '{' constDeclaration* '}' 'in' '{' stmt* '}'
+    ;
+
+// State,emts de letIn
+stmt
+    : variableDeclaration
+    | assignment
+    | printStmt
+    | functionCall
+    | expr
     ;
 
 
 // Declaración de constantes (solo const)
  constDeclaration
-     : 'const' ID '=' lambdaExpr
-     | 'const' ID '=' expr
+     : 'const' ID '=' expr
      ;
-
- // Expresión lambda
- lambdaExpr
-     : '(' paramList? ')' '=>' expr
-     ;
-
 
 
 // Declaración de `print`

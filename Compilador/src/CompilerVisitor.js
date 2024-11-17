@@ -38,7 +38,6 @@ export default class CompilerVisitor extends BiesVisitor {
 
             if (child.constructor.name === 'FunctionDeclarationContext') {
                 let bindingIndex = this.globalBindingCounter++;
-                logger.debug("Binding index Program: ",bindingIndex);
                 const functionCode = this.visit(child);
                 functionDeclarations.push(...functionCode);
 
@@ -57,8 +56,13 @@ export default class CompilerVisitor extends BiesVisitor {
         }
 
         mainBody.push(`$END $0`, `INI $0`);
+
+        logger.debug('visitProgram mainBody:', mainBody);
+
+        // Combina todo en texto con `join('\n')` al final
         return [...functionDeclarations, ...mainBody].join('\n');
     }
+
 
 
     visitVariableDeclaration(ctx) {
@@ -182,6 +186,7 @@ export default class CompilerVisitor extends BiesVisitor {
 
 
     visitFunctionCall(ctx) {
+        this.isInPrintOrFunction = true;
         let functionName;
         if (ctx.ID){
             functionName = ctx.ID().getText();
@@ -194,10 +199,6 @@ export default class CompilerVisitor extends BiesVisitor {
         }
         logger.debug("FunctionName: ", functionName);
         const args = ctx.expr ? ctx.expr() : [];
-
-        this.isInPrintOrFunction = true;
-
-        const greetings = 'greetings';
 
         // Obtiene el contexto y el índice de binding de la función desde `functionBindings`
         const binding = this.functionBindings[functionName];
@@ -238,19 +239,24 @@ export default class CompilerVisitor extends BiesVisitor {
     }
 
     visitAddSubExpr(ctx) {
-
         const left = this.visit(ctx.expr(0));
         const right = this.visit(ctx.expr(1));
 
+        let operator;
+
         if (ctx.op.text === '+') {
             if (this.isInPrintOrFunction) {
-                // Generar instrucciones asegurando que sean cadenas
-                return [...left, ...right, 'CAT'];
+                operator = 'CAT';
             } else {
-                return [...left, ...right, 'ADD'].join('\n');
+                // Suma de números
+                operator = 'ADD';
             }
+        } else {
+            operator = 'SUB';
         }
-        return [...left, ...right, 'SUB'];
+        logger.debug('visitAddSubExpr result:', [...left, ...right, operator]);
+
+        return [...left, ...right, operator];
     }
 
 
@@ -280,66 +286,91 @@ export default class CompilerVisitor extends BiesVisitor {
         return [...exprCode, 'PRN'].join('\n');
     }
 
+    flatten(arr) {
+        return arr.reduce(
+            (flat, toFlatten) =>
+                flat.concat(Array.isArray(toFlatten) ? this.flatten(toFlatten) : toFlatten),
+            []
+        );
+    }
+
     visitLetInExpr(ctx) {
-        const newContext = this.getCurrentContext()
+
+        logger.debug('LetInExpr Context:', ctx.toStringTree());
+        
+        const newContext = this.getCurrentContext();
 
         const declarations = ctx.constDeclaration();
         const result = [];
 
+        // Procesar las declaraciones en el bloque "let"
         for (const declaration of declarations) {
             const declarationCode = this.visit(declaration);
-            result.push(...declarationCode);
+            if (Array.isArray(declarationCode)) {
+                result.push(...declarationCode);
+            } else {
+                result.push(declarationCode);
+            }
         }
 
-        const expr = this.visit(ctx.expr());
-        if (Array.isArray(expr)) {
-            result.push(...expr);
-        } else {
-            result.push(`LDV ${expr}`);
+        // Procesar las instrucciones en el bloque "in"
+        const statements = ctx.stmt();
+        for (const stmt of statements) {
+            const stmtCode = this.visit(stmt); // Usa `visit` para manejar cada tipo de stmt
+            if (Array.isArray(stmtCode)) {
+                result.push(...stmtCode);
+            } else {
+                result.push(stmtCode);
+            }
         }
 
-        return result;
+        const flattenedResult = this.flatten(result);
+        logger.debug('Let-In Result:', flattenedResult); // Diagnóstico del resultado final
+        return flattenedResult;
     }
 
+
     visitConstDeclaration(ctx) {
-        const variableName = ctx.ID().getText(); // Nombre de la variable
-        const currentContext = this.getCurrentContext(); // Contexto actual
-        const bindingIndex = this.globalBindingCounter++; // Índice único para el binding
+        logger.debug('ConstDeclaration Context:', ctx.getText());
+        logger.debug('Expr Exists:', !!ctx.expr());
+        const variableName = ctx.ID().getText();
+        const currentContext = this.getCurrentContext();
+        const bindingIndex = this.globalBindingCounter++;
 
         // Verifica si la constante ya existe en el contexto actual
         if (this.variables[variableName] && this.variables[variableName].context === currentContext) {
             throw new Error(`La constante "${variableName}" ya está declarada en este contexto.`);
         }
 
+        // Registra la variable en el contexto actual
         this.variables[variableName] = {
             context: currentContext,
             index: bindingIndex,
-            mutable: false // `const` es siempre inmutable
+            mutable: false, // Constantes siempre son inmutables
         };
 
-        // Genera código para el valor asignado
         const result = [];
-        if (ctx.lambdaExpr()) {
-            // Si es una lambda, genera su código
-            const lambdaCode = this.visit(ctx.lambdaExpr());
-            result.push(...lambdaCode);
+        let valueCode;
+
+        // Verifica si el nodo tiene un hijo expr
+        if (ctx.expr()) {
+            valueCode = this.visit(ctx.expr());
         } else {
-            // Si es una expresión normal, genera su código
-            const valueCode = this.visit(ctx.expr());
-            if (Array.isArray(valueCode)) {
-                result.push(...valueCode);
-            } else {
-                result.push(`LDV ${valueCode}`);
-            }
+            throw new Error(`No se encontró una expresión válida para la constante "${variableName}".`);
         }
 
-        // Almacena el resultado en el binding
+        // Genera el código correspondiente
+        if (Array.isArray(valueCode)) {
+            result.push(...valueCode);
+        } else {
+            result.push(`LDV ${valueCode}`);
+        }
+
+        // Añade la instrucción BST para guardar la constante
         result.push(`BST ${currentContext} ${bindingIndex}`);
+
         return result;
     }
-
-
-
 
 }
 

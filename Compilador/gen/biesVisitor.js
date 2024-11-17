@@ -42,14 +42,14 @@ export default class biesVisitor extends antlr4.tree.ParseTreeVisitor {
 	}
 
 
-	// Visit a parse tree produced by biesParser#constDeclaration.
-	visitConstDeclaration(ctx) {
+	// Visit a parse tree produced by biesParser#stmt.
+	visitStmt(ctx) {
 	  return this.visitChildren(ctx);
 	}
 
 
-	// Visit a parse tree produced by biesParser#lambdaExpr.
-	visitLambdaExpr(ctx) {
+	// Visit a parse tree produced by biesParser#constDeclaration.
+	visitConstDeclaration(ctx) {
 	  return this.visitChildren(ctx);
 	}
 
