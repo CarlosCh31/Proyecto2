@@ -2,7 +2,7 @@ import { spawnSync } from 'child_process';
 import { readdir } from 'fs/promises';
 import path from 'path';
 import biesVM from '../Maquina Virtual/src/biesVM.js';
-import fs from "fs";
+import fs from 'fs';
 
 const testFolder = path.resolve('./test');
 const biesCCommand = path.resolve('./src/main.js');
@@ -26,7 +26,12 @@ async function runTests() {
             const basmFile = filePath.replace('.bies', '.basm');
 
             console.log(`\n🔄 [${index + 1}/${biesFiles.length}] Compilando archivo: ${file}`);
-            await compileFile(filePath, basmFile);
+            const compileSuccess = await compileFile(filePath, basmFile);
+
+            if (!compileSuccess) {
+                console.error(`❌ Error al compilar el archivo: ${file}. Continuando con el siguiente...\n`);
+                continue;
+            }
 
             console.log(`▶️ Ejecutando en máquina virtual: ${basmFile}`);
             const vmOutput = executeFileInVM(basmFile);
@@ -41,37 +46,65 @@ async function runTests() {
     }
 }
 
-function compileFile(inputFile, outputFile) {
-    const commandArgs = [biesCCommand, inputFile, '--o', outputFile];
-    const result = spawnSync('node', commandArgs, { encoding: 'utf-8' });
+async function compileFile(inputFile, outputFile) {
+    try {
+        if (!fs.existsSync(inputFile)) {
+            console.error(`❌ El archivo de entrada no existe: ${inputFile}`);
+            return false;
+        }
 
-    if (result.error) {
-        throw new Error(result.error.message);
+        const commandArgs = [biesCCommand, inputFile, '--o', outputFile];
+        const result = spawnSync('node', commandArgs, { encoding: 'utf-8' });
+
+        if (result.error) {
+            console.error(`⚠️ Error al ejecutar el compilador:\n${result.error.message}`);
+            return false;
+        }
+
+        if (result.stderr.trim()) {
+            console.error(`⚠️ Error del compilador:\n${result.stderr.trim()}`);
+            return false;
+        }
+
+        console.log(`📄 Compilación exitosa: ${outputFile}`);
+        return true;
+    } catch (err) {
+        console.error(`❌ Error inesperado durante la compilación: ${err.message}`);
+        return false;
     }
-    if (result.stderr) {
-        console.error(`⚠️ Error:\n${result.stderr}`);
-    }
-    console.log(`📄 Compilación exitosa: ${outputFile}`);
 }
 
 function executeFileInVM(basmFile) {
-    const instructions = parseBasmFile(basmFile);
-    const vm = new biesVM();
-    vm.execute(instructions);
+    try {
+        if (!fs.existsSync(basmFile)) {
+            return `⚠️ Archivo .basm no encontrado: ${basmFile}`;
+        }
 
-    // Retornar la salida almacenada en `vm.output`
-    return vm.output.length > 0 ? vm.output.join('\n') : '<Sin salida capturada>';
+        const instructions = parseBasmFile(basmFile);
+        const vm = new biesVM();
+        vm.execute(instructions);
+
+        // Retornar la salida almacenada en `vm.output`
+        return vm.output.length > 0 ? vm.output.join('\n') : '<Sin salida capturada>';
+    } catch (err) {
+        return `❌ Error durante la ejecución en la máquina virtual: ${err.message}`;
+    }
 }
 
 function parseBasmFile(basmFile) {
-    const content = fs.readFileSync(basmFile, 'utf-8');
-    return content
-        .trim()
-        .split('\n')
-        .map(line => {
-            const tokens = line.split(' ');
-            return [tokens[0], ...tokens.slice(1)];
-        });
+    try {
+        const content = fs.readFileSync(basmFile, 'utf-8');
+        return content
+            .trim()
+            .split('\n')
+            .map(line => {
+                const tokens = line.split(' ');
+                return [tokens[0], ...tokens.slice(1)];
+            });
+    } catch (err) {
+        console.error(`❌ Error al leer el archivo .basm: ${err.message}`);
+        return [];
+    }
 }
 
 runTests();
